@@ -1,0 +1,10 @@
+# CodeIgniter
+*/config/development/
+# Uploads & generated reports
+assets/reports/
+# OS
+.DS_Store
+Thumbs.db
+# Logs
+*.log
+error_log
