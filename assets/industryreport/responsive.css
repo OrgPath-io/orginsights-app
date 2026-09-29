@@ -1,0 +1,129 @@
+/* RESPONSIVE CSS */
+/*----------------------------- Small Laptop -----------------------------*/
+@media only screen and (max-width :1280px) and (min-width: 1101px) {
+    
+}
+
+/*----------------------------- Media 1024 -------------------------------*/
+@media only screen and (max-width :1100px) {
+    .toparea-section .wrapper {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 50px;
+    }
+    .tabs {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .develop-tabs .tabs {
+        word-break: break-word;
+    }
+}
+
+/*----------------------------- Media 480 --------------------------------*/
+@media only screen and (max-width:767px) {
+    .page-title h1 {
+        font-size: 30px;
+    }
+    .page-title h3 {
+        font-size: 28px;
+        margin: 10px 0 0px;
+    }
+    .page-title p {
+        font-size: 16px;
+    }
+    .progress-circle, .progress-circlered {
+        width: 90px;
+        height: 90px;
+    }
+    .progress-text {
+        font-size: 22px;
+    }
+    .score-content li h3 {
+        font-size: 18px;
+        line-height: 20px;
+    }
+    .tagline img.icon {
+        max-width: 180px;
+    }
+    .tabs, .develop-tabs .tabs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .tab {
+        padding: 35px 15px;
+    }
+    .tab-content ul.lft-con li {
+        padding: 12px 0 12px 50px;
+    }
+    .develop-tabs .tab.active {
+        border-radius: 15px;
+    }
+    .develop-tabs .tab.active:before {
+        display: none;
+    }
+
+    .nested-tabs {
+        gap: 10px 60px;
+        flex-wrap: wrap;
+    }
+    .topindustry-section .tab-content .inner-tabcon div:nth-child(odd) {
+        overflow: hidden;
+        padding-left: 10px !important;
+        font-size: 19px;
+    }
+}
+
+/*----------------------------- Media 320 --------------------------------*/
+@media only screen and (max-width:479px) {
+    .logo img {
+        max-width: 260px;
+    }
+    .page-title h1 {
+        font-size: 26px;
+    }
+    .title-section {
+        padding: 20px;
+    }
+    .title-section img.icon {
+        max-width: 30px;
+    }
+    .title-section h3, .page-title h3 {
+        font-size: 23px;        
+    }
+    .title-section p {
+        font-size: 16px;
+    }
+    .toparea-section .title-section:before {
+        right: 10px;
+        width: 50px;
+        height: 50px;
+    }
+    .tagline {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .score-content ul {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .nested-tabs {
+        gap: 10px 10px;
+        padding: 0 10px;
+    }
+    .development-section .title-section img.icon {
+        max-width: 60px;
+    }
+    button#closeAllTabs {
+        right: 10px;
+        top: 15px;
+        font-size: 19px;
+        width: 30px;
+        height: 30px;
+    }
+    .tab {
+        font-size: 18px;
+    }
+    .nested-tab {
+        font-size: 18px;
+    }
+    .inner-nested-tabcon {
+        padding: 30px 20px;
+    }
+}

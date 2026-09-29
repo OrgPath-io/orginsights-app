@@ -1,0 +1,84 @@
+@charset "utf-8";
+/* CSS Document */
+.full-img img{ width:100%; height:auto;}
+img.img-crop { display:block; max-width:none }
+.table-cell {display:table-cell; vertical-align:middle; padding:0;}
+.table-div{ display:table; height:100%; width:100%; }
+
+.login-bg{ background:url(/appAdmin/assets/images/bg.jpg) no-repeat center; background-size:cover; min-height:100vh;}
+.login-box{ background:#fff; padding:55px; border-radius:15px; margin:0 auto; max-width:530px;}
+.shadow-img{ line-height:0; text-align:center;}
+.login-box .form-control, .login-box .form-control:focus{ border-top:none; border-left:none; border-right:none; border-bottom:2px solid #cfcfcf; border-radius:0; box-shadow:none; background:none; padding-left:0; padding-right:0;}
+.login-box input[type="checkbox"] { display:none;}
+.login-box  input[type="checkbox"] + label {margin-bottom:0; cursor:pointer;}
+.login-box  input[type="checkbox"] + label span { position:relative; height:15px; background:#d7d7d7; border-radius:30px; display:block; width:50px;}
+.login-box  input[type="checkbox"] + label span:before{ background:#fff; height:25px; width:25px; top:50%; -webkit-transform:translateY(-50%); -ms-transform:translateY(-50%); transform:translateY(-50%); left:0; -webkit-box-shadow:0 0 10px 0 rgba(0,0,0,0.15); box-shadow:0 0 10px 0 rgba(0,0,0,0.15); position:absolute; content:''; left:0; border-radius:50%; pointer-events:none; -moz-transition:all 0.5s ease;  -webkit-transition:all 0.5s ease; -o-transition:all 0.5s ease; transition:all 0.5s ease;}
+.login-box  input[type="checkbox"]:checked + label span { background:#1c935f;}
+.login-box  input[type="checkbox"]:checked + label span:before{ left:25px;}
+.login-box{ color:rgba(0,0,0,0.5)}
+.login-box a{ text-decoration:underline; color:rgba(0,0,0,0.5)}
+.login-box a:hover{ color:#3b379c; text-decoration:none;}
+
+.header{ background:#fff; position:fixed; top:0; left:0; right:0; z-index:500; padding:20px; z-index:210}
+.header .logo img{ width:200px;}
+.header h5{ margin:0 0 0 24px; padding-left:24px; border-left:1px solid #d8d8d8;}
+.header .user-info{ font-size:12px; text-align:right;}
+.header .user-info h4{ font-size:18px; font-weight:500; margin:0;}
+.header .logout{ height:36px; width:36px; line-height:36px; font-size:26px; text-align:center; margin-left:16px;}
+.header-search { margin-left:auto; width:100%; max-width:20%;}
+.header-search .form-control, .header-search .form-control:focus{ background:none; box-shadow:none; border:none; background:url(/appAdmin/assets/images/search.png) no-repeat left; padding-left:32px;}
+
+#page{ padding-top:88px;}
+body.dash-body{ background:url(/appAdmin/assets/images/bg-concreate.jpg) no-repeat center; background-size:cover;}
+.dashboard-wrapper{ padding:40px;}
+.dashboard-wrapper .content{ background:#fff; padding:40px; -webkit-box-shadow:0 0 20px 0 rgba(0,0,0,0.05); box-shadow:0 0 20px 0 rgba(0,0,0,0.05);}
+.dashboard-wrapper .content .title .form-group{ margin-bottom:0;}
+.dashboard-wrapper .content .title a{ height:28px; width:28px; line-height:28px; font-size:18px;}
+.dashboard-wrapper .content .title .form-group + .form-group{ margin-left:10px;}
+.dashboard-wrapper .content .title .form-control, .dashboard-wrapper .content .title .form-control:focus{ border-radius:30px; height:30px; padding:0 8px; width:140px; font-size:14px; background:#f3f3f7; box-shadow:none;}
+.quick-access .row{ margin-left:-8px; margin-right:-8px;}
+.quick-access .row [class*=col-]{ margin-top:16px; padding-left:8px; padding-right:8px; -ms-flex:0 0 20%; flex:0 0 20%; max-width:20%;}
+.quick-access .row [class*=col-] .btn{ text-align:left; position:relative;}
+.quick-access .row [class*=col-] .btn:after{top:50%; -webkit-transform:translateY(-50%); -ms-transform:translateY(-50%); transform:translateY(-50%); right:20px; content:'\f105'; font-family:'Font Awesome 5 Free'; font-weight:900; position:absolute;}
+.footer{ padding:20px; text-align:center;}
+.dashform .row{ margin-left:-2px; margin-right:-2px;}
+.dashform .row [class*=col-]{ padding-left:2px; padding-right:2px; margin-bottom:4px;}
+.dashform .row [class*=col-] .form-control, .dashform .row [class*=col-] .form-control:focus{ border:none; border-radius:0; background:#f3f3f7;  font-size:14px;}
+.dashform  .btn{ line-height:40px;}
+
+.stats [class*=col-] .box{background: url(/appAdmin/assets/images/line.jpg) repeat-x top #fff; position:relative;}
+.stats [class*=col-] .box:after{ background:url(/appAdmin/assets/images/box-img-1.png) no-repeat right; content:''; position:absolute; top:0; left:0; right:0; bottom:0; z-index:1;}
+.stats [class*=col-] .box .media{ align-items:center; -webkit-align-items:center; position:relative; z-index:10}
+.stats [class*=col-] .box .media h2{  margin-bottom:0; font-size:50px;}
+
+.sidebar{ width:240px; position:fixed; z-index:199; padding-top:88px; top:0; left:0; bottom:0;  font-size:16px; -moz-transition:all 0.5s ease;  -webkit-transition:all 0.5s ease; -o-transition:all 0.5s ease; transition:all 0.5s ease; overflow:auto; overflow-x:hidden; background: #146fa4;
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzE0NmZhNCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxZjlmNDkiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top,  #146fa4 0%, #1f9f49 100%);
+background: -webkit-linear-gradient(top,  #146fa4 0%,#1f9f49 100%);
+background: linear-gradient(to bottom,  #146fa4 0%,#1f9f49 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#146fa4', endColorstr='#1f9f49',GradientType=0 );}
+.sidebar .main-menu{ margin:0; padding:0; list-style:none;}
+.sidebar .main-menu > li{ border-bottom:1px solid rgba(255,255,255,0.2);}
+.sidebar .main-menu > li:last-child{ border-bottom:none;}
+.sidebar .main-menu > li > a{color:#fff; padding:10px 20px; display:block; position:relative}
+.sidebar .main-menu > li > a:hover {color:#000; background:#ffffff; text-decoration:none;}
+.sidebar .main-menu > li > a.parent:after{ content:''; right:20px; content:'\f105'; position:absolute; font-family:'Font Awesome 5 Free'; font-weight:900; top:50%; -webkit-transform:translateY(-50%); -ms-transform:translateY(-50%); transform:translateY(-50); color:#6762d6;}
+.sidebar .main-menu > li:hover > a.parent:after{ color:#fff;}
+.sidebar .main-menu > li.active > a.parent:after{ content:''; right:20px; content:'\f107'; position:absolute; font-family:'Font Awesome 5 Free'; font-weight:900; top:50%; -webkit-transform:translateY(-50%); -ms-transform:translateY(-50%); transform:translateY(-50); color:#fff;}
+.sidebar .main-menu li:hover > a,.sidebar .main-menu li.current-menu-item > a, .sidebar .main-menu li.current-menu-parent > a{color:#000; background:#fff;}
+.sidebar .main-menu ul{ margin:0; padding:0; list-style:none; background:#1d1b48;}
+.sidebar .main-menu ul li{border-bottom:1px solid rgba(255,255,255,0.2);}
+.sidebar .main-menu ul li:last-child{ border:none;}
+.sidebar .main-menu ul li a{ padding:10px 20px; color:#fff; display:block;}
+.sidebar .main-menu ul li a:hover{ color:#fff; text-decoration:none; }
+
+.body-wrapper{ min-height:calc(100vh - 155px); margin-left:240px; padding:40px;}
+.footer.footer-inner{ margin-left:240px;}
+.table-list button{ padding:0; border:none; background:none;}
+.table-list a{ color:#333079; text-decoration:underline;}
+.table-list{ font-size:15px;}
+.table-list .table > thead > tr > th{ border:none; color:#fff; background:#464646;}
+.table-list .table > tbody > tr > td{ vertical-align:middle;}
+.table-list .media{ align-items:center;}
+.menu-btn{ height:36px; width:36px; padding:0; border:none; background:url(/appAdmin/assets/images/menu.png) no-repeat center; background-size:26px;}
+.menu-btn.active{ background:url(/appAdmin/assets/images/cancel.png) no-repeat center; background-size:26px;}
