@@ -1,0 +1,115 @@
+{
+  "ok": true,
+  "url": "https://artifact-capture.invalid/spaces/v2/hatch-audit-39e4789a-9879-44ee-a4df-3f913a392ec9/",
+  "duration_ms": 4715.301678,
+  "output_dir": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-06T08-56-19Z-471920634",
+  "nav_status": 200,
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-06T08-56-19Z-471920634/screenshot.png",
+      "fullpage_screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-06T08-56-19Z-471920634/screenshot-full.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-06T08-56-19Z-471920634/screenshot-mobile.png"
+    }
+  },
+  "mobile_layout": {
+    "viewport_width": 390,
+    "scroll_width": 390,
+    "overflow_px": 0,
+    "widest_selector": null,
+    "verdict": "pass"
+  },
+  "horizontal_scrollers": [],
+  "unreachable_controls": {
+    "desktop": [],
+    "mobile": []
+  },
+  "clipped": {
+    "desktop": [],
+    "mobile": []
+  },
+  "images": {
+    "total": 2,
+    "broken": [],
+    "duplicate": [],
+    "unstable": [],
+    "failed_requests": [],
+    "external_blocked": {
+      "count": 0,
+      "sample": []
+    },
+    "sample_urls": [
+      "https://artifact-capture.invalid/spaces/v2/hatch-audit-39e4789a-9879-44ee-a4df-3f913a392ec9/assets/orginsights-logo-n6rezs15.png",
+      "https://artifact-capture.invalid/spaces/v2/hatch-audit-39e4789a-9879-44ee-a4df-3f913a392ec9/assets/assessment-options-z249rrkx.jpg"
+    ],
+    "verdict": "pass"
+  },
+  "text_issues": [],
+  "console_errors": [],
+  "console_warnings": [],
+  "external_fetch_failures": 0,
+  "external_fetch_failure_samples": [],
+  "blocked_requests": [],
+  "external_requests": [],
+  "external_requests_dropped": 0,
+  "external_requests_dropped_data_bearing": 0,
+  "transport_ledger_active": true,
+  "egress_lockdown": true,
+  "transport_connections": [
+    {
+      "host": "artifact-capture.invalid",
+      "port": 443,
+      "connects": 2,
+      "bytes_up": 4100,
+      "bytes_down": 2486
+    }
+  ],
+  "transport_udp_attempts": 0,
+  "transport_overflow": 0,
+  "unexplained_transport_hosts": [],
+  "broken_assets": [],
+  "blocked_affordances": [],
+  "interactive_nodes": 10,
+  "aria_snapshot": "- complementary:\n  - img \"OrgInsights\"\n  - navigation:\n    - button \"Home\"\n    - button \"Assess\"\n    - button \"Reports\"\n    - button \"Plans\"\n    - button \"Admin\"\n  - button \"Open profile\": TV\n- main:\n  - paragraph: Choose your tier\n  - heading \"Start with the view you need.\" [level=1]\n  - paragraph: Every paid tier is a one-time purchase. Choose the depth, feedback, and support that fit your next move.\n  - figure \"Start with a focused snapshot, the complete assessment, multi-rater insight, or assessment plus coaching.\":\n    - img \"Professionals reviewing capability assessment options together\"\n    - text: Start with a focused snapshot, the complete assessment, multi-rater insight, or assessment plus coaching.\n  - button \"Free snapshot $0 free 30 questions, 7 to 10 minutes, and a pillar-level percentage report. 15 self + 15 OrgInsights questions Five pillar percentages No 360 or career toolkit\":\n    - text: Free snapshot $0 free\n    - paragraph: 30 questions, 7 to 10 minutes, and a pillar-level percentage report.\n    - list:\n      - listitem: 15 self + 15 OrgInsights questions\n      - listitem: Five pillar percentages\n      - listitem: No 360 or career toolkit\n  - button \"Full Assessment $99 one-time The complete 93-question assessment, 7-page report, and career toolkit. Career-tier benchmarks Industry best-fit and learning recommendations AI resume analyzer + development plan\":\n    - text: Full Assessment $99 one-time\n    - paragraph: The complete 93-question assessment, 7-page report, and career toolkit.\n    - list:\n      - listitem: Career-tier benchmarks\n      - listitem: Industry best-fit and learning recommendations\n      - listitem: AI resume analyzer + development plan\n  - button \"Most popular 360 Assessment $149 one-time Everything in Full Assessment plus 3 to 10 peer and mentor raters. Hidden Talents vs Blind Spots Login-free rater links 7, 14, or 21-day reminders\":\n    - text: Most popular 360 Assessment $149 one-time\n    - paragraph: Everything in Full Assessment plus 3 to 10 peer and mentor raters.\n    - list:\n      - listitem: Hidden Talents vs Blind Spots\n      - listitem: Login-free rater links\n      - listitem: 7, 14, or 21-day reminders\n  - button \"360 + Coaching $199 one-time Everything in the 360 Assessment plus one coaching session. Complete assessment and report Multi-rater Gap Metric One coaching session booking\":\n    - text: 360 + Coaching $199 one-time\n    - paragraph: Everything in the 360 Assessment plus one coaching session.\n    - list:\n      - listitem: Complete assessment and report\n      - listitem: Multi-rater Gap Metric\n      - listitem: One coaching session booking\n  - region \"Four clear starting points\":\n    - paragraph: At a glance\n    - heading \"Four clear starting points\" [level=2]\n    - table:\n      - rowgroup:\n        - row \"Tier Assessment What it adds\":\n          - columnheader \"Tier\"\n          - columnheader \"Assessment\"\n          - columnheader \"What it adds\"\n      - rowgroup:\n        - row \"Free 30-question snapshot Pillar percentages\":\n          - rowheader \"Free\"\n          - cell \"30-question snapshot\"\n          - cell \"Pillar percentages\"\n        - row \"$99 93-question full Detailed report + toolkit\":\n          - rowheader \"$99\"\n          - cell \"93-question full\"\n          - cell \"Detailed report + toolkit\"\n        - row \"$149 93-question 360 Gap Metric + 3–10 raters\":\n          - rowheader \"$149\"\n          - cell \"93-question 360\"\n          - cell \"Gap Metric + 3–10 raters\"\n        - row \"$199 93-question 360 Everything + coaching\":\n          - rowheader \"$199\"\n          - cell \"93-question 360\"\n          - cell \"Everything + coaching\"\n  - heading \"Start testing from the beginning\" [level=2]\n  - paragraph: Clear this testing profile, its assessments, answers, raters, orders and progress, then return to registration.\n  - button \"Reset testing profile\"",
+  "audit_session_id": "177ce55a-8b87-48eb-81c8-30f8b1afc50b",
+  "readiness": {
+    "desktop": {
+      "settled": true,
+      "settle_ms": 1372,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    },
+    "mobile": {
+      "settled": true,
+      "settle_ms": 1359,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    }
+  },
+  "color_scheme": {
+    "declared": "light",
+    "media_dependent": null,
+    "dark_frame": false
+  },
+  "mobile_ms": 3200.810464,
+  "cold_launch_ms": 460.4377710000001,
+  "desktop_ms": 3281.3019680000007,
+  "browser_launches": 1,
+  "audit_path": "shared-concurrent",
+  "diagnostics": {
+    "audit_path": "shared-concurrent",
+    "concurrent_ran": true,
+    "concurrent_desktop_retry": false,
+    "concurrent_mobile_retry": false,
+    "shared_launch_failed": false,
+    "nav_retries": 0,
+    "settle_retries": 0
+  }
+}

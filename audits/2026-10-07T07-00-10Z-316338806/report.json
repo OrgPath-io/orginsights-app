@@ -1,0 +1,128 @@
+{
+  "ok": true,
+  "url": "https://artifact-capture.invalid/spaces/v2/hatch-audit-9ea6fbe6-16bf-4e84-a058-0bd352c92c45/",
+  "duration_ms": 6757.407311,
+  "output_dir": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T07-00-10Z-316338806",
+  "nav_status": 200,
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T07-00-10Z-316338806/screenshot.png",
+      "fullpage_screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T07-00-10Z-316338806/screenshot-full.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T07-00-10Z-316338806/screenshot-mobile.png"
+    }
+  },
+  "mobile_layout": {
+    "viewport_width": 390,
+    "scroll_width": 390,
+    "overflow_px": 0,
+    "widest_selector": null,
+    "verdict": "pass"
+  },
+  "horizontal_scrollers": [],
+  "unreachable_controls": {
+    "desktop": [],
+    "mobile": []
+  },
+  "clipped": {
+    "desktop": [],
+    "mobile": []
+  },
+  "images": {
+    "total": 1,
+    "broken": [],
+    "duplicate": [],
+    "unstable": [],
+    "failed_requests": [],
+    "external_blocked": {
+      "count": 0,
+      "sample": []
+    },
+    "sample_urls": [
+      "https://artifact-capture.invalid/spaces/v2/hatch-audit-9ea6fbe6-16bf-4e84-a058-0bd352c92c45/assets/orginsights-logo-n6rezs15.png"
+    ],
+    "verdict": "pass"
+  },
+  "text_issues": [],
+  "console_errors": [],
+  "console_warnings": [],
+  "external_fetch_failures": 0,
+  "external_fetch_failure_samples": [],
+  "blocked_requests": [],
+  "external_requests": [
+    {
+      "url": "https://calendar.app.google/xwabGNeAS72avS8J6",
+      "method": "GET",
+      "resource_type": "document"
+    }
+  ],
+  "external_requests_dropped": 0,
+  "external_requests_dropped_data_bearing": 0,
+  "transport_ledger_active": true,
+  "egress_lockdown": true,
+  "transport_connections": [
+    {
+      "host": "artifact-capture.invalid",
+      "port": 443,
+      "connects": 2,
+      "bytes_up": 3940,
+      "bytes_down": 2486
+    },
+    {
+      "host": "calendar.app.google",
+      "port": 443,
+      "connects": 4,
+      "bytes_up": 0,
+      "bytes_down": 0,
+      "policy_denied": true
+    }
+  ],
+  "transport_udp_attempts": 0,
+  "transport_overflow": 0,
+  "unexplained_transport_hosts": [],
+  "broken_assets": [],
+  "blocked_affordances": [],
+  "interactive_nodes": 14,
+  "aria_snapshot": "- complementary:\n  - img \"OrgInsights\"\n  - navigation:\n    - button \"Home\"\n    - button \"Assess\"\n    - button \"360\"\n    - button \"Reports\"\n    - button \"Tools\"\n    - button \"Plans\"\n    - button \"Admin\"\n  - button \"Open profile\": AM\n- main:\n  - paragraph: Your capability path\n  - heading \"Good evening, Akeel.\" [level=1]\n  - paragraph: Complete your two sections, then invite trusted raters for a rounded view.\n  - text: 360 path\n  - strong: 100%\n  - text: candidate assessment complete\n  - article:\n    - text: \"01\"\n    - heading \"Complete self assessment\" [level=2]\n    - text: completed\n    - paragraph: Reflect on all Self-Assessment statements.\n    - button \"Open Complete self assessment\"\n  - article:\n    - text: \"02\"\n    - heading \"OrgInsights assessment\" [level=2]\n    - text: completed\n    - paragraph: Complete every work-context question.\n    - button \"Open OrgInsights assessment\"\n  - article:\n    - text: \"03\"\n    - heading \"360 feedback\" [level=2]\n    - text: 3 complete\n    - paragraph: Invite 3–10 people, schedule reminders, and compare perspectives.\n    - button \"Open 360 feedback\"\n  - paragraph: Your workspace\n  - heading \"Turn insight into action.\" [level=2]\n  - paragraph: Everything you unlock stays within the same clear path.\n  - button \"Detailed report Full capability detail\"\n  - button \"Tools & guides Interpret, reflect and plan your next move\"\n  - button \"Plan options Review access options\"\n  - paragraph: Coaching session\n  - heading \"Book a Coaching Session\" [level=2]\n  - paragraph: Choose a time in Google Calendar, then confirm the session date here.\n  - iframe\n  - paragraph: After booking, confirm the date so your upcoming session appears here.\n  - text: Session date\n  - textbox \"Session date\"\n  - button \"I've booked my session\" [disabled]\n  - paragraph: Assessment history\n  - heading \"Compare your results over time.\" [level=2]\n  - button \"Start a new assessment\"\n  - article:\n    - text: Attempt 1 Oct 7, 2026 Full OrgInsights\n    - button \"Download PDF\"\n    - emphasis: L\n    - strong: 78%\n    - emphasis: E\n    - strong: 38%\n    - emphasis: A\n    - strong: 36%\n    - emphasis: D\n    - strong: 60%\n    - emphasis: S\n    - strong: 60%\n  - heading \"Start testing from the beginning\" [level=2]\n  - paragraph: Clear this testing profile, its assessments, answers, raters, orders and progress, then return to registration.\n  - button \"Reset testing profile\"",
+  "audit_session_id": "38240197-6b1c-42b3-9e43-9e481c56e210",
+  "readiness": {
+    "desktop": {
+      "settled": true,
+      "settle_ms": 2503,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    },
+    "mobile": {
+      "settled": true,
+      "settle_ms": 2517,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    }
+  },
+  "color_scheme": {
+    "declared": "light",
+    "media_dependent": null,
+    "dark_frame": false
+  },
+  "mobile_ms": 5056.6812,
+  "cold_launch_ms": 632.235909,
+  "desktop_ms": 5152.038805,
+  "browser_launches": 1,
+  "audit_path": "shared-concurrent",
+  "diagnostics": {
+    "audit_path": "shared-concurrent",
+    "concurrent_ran": true,
+    "concurrent_desktop_retry": false,
+    "concurrent_mobile_retry": false,
+    "shared_launch_failed": false,
+    "nav_retries": 0,
+    "settle_retries": 0
+  }
+}

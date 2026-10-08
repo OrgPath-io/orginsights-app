@@ -1,0 +1,1 @@
+ALTER TABLE `reputation_scans` ADD `emails` text;

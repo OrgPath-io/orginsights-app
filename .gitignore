@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+bun.lockb
+
+# Runtime data
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Build output
+client/dist/
+client/dist-cvm/
+server/dist/
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Replit
+.replit.nix

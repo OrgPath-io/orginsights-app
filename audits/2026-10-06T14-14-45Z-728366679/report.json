@@ -1,0 +1,127 @@
+{
+  "ok": true,
+  "url": "https://artifact-capture.invalid/spaces/v2/hatch-audit-c4b2afdc-d4eb-4541-a4d0-4efd31af500a/",
+  "duration_ms": 4624.682241,
+  "output_dir": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-06T14-14-45Z-728366679",
+  "nav_status": 200,
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-06T14-14-45Z-728366679/screenshot.png",
+      "fullpage_screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-06T14-14-45Z-728366679/screenshot-full.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-06T14-14-45Z-728366679/screenshot-mobile.png"
+    }
+  },
+  "mobile_layout": {
+    "viewport_width": 390,
+    "scroll_width": 390,
+    "overflow_px": 0,
+    "widest_selector": null,
+    "verdict": "pass"
+  },
+  "horizontal_scrollers": [],
+  "unreachable_controls": {
+    "desktop": [],
+    "mobile": []
+  },
+  "clipped": {
+    "desktop": [],
+    "mobile": [
+      {
+        "tag": "h1",
+        "text": "Good evening, SnapshotNeg.",
+        "kind": "text_truncated",
+        "overflow_px": 26,
+        "bbox": [
+          40,
+          74,
+          206,
+          119
+        ]
+      }
+    ]
+  },
+  "images": {
+    "total": 1,
+    "broken": [],
+    "duplicate": [],
+    "unstable": [],
+    "failed_requests": [],
+    "external_blocked": {
+      "count": 0,
+      "sample": []
+    },
+    "sample_urls": [
+      "https://artifact-capture.invalid/spaces/v2/hatch-audit-c4b2afdc-d4eb-4541-a4d0-4efd31af500a/assets/orginsights-logo-n6rezs15.png"
+    ],
+    "verdict": "pass"
+  },
+  "text_issues": [],
+  "console_errors": [],
+  "console_warnings": [],
+  "external_fetch_failures": 0,
+  "external_fetch_failure_samples": [],
+  "blocked_requests": [],
+  "external_requests": [],
+  "external_requests_dropped": 0,
+  "external_requests_dropped_data_bearing": 0,
+  "transport_ledger_active": true,
+  "egress_lockdown": true,
+  "transport_connections": [
+    {
+      "host": "artifact-capture.invalid",
+      "port": 443,
+      "connects": 2,
+      "bytes_up": 4068,
+      "bytes_down": 2487
+    }
+  ],
+  "transport_udp_attempts": 0,
+  "transport_overflow": 0,
+  "unexplained_transport_hosts": [],
+  "broken_assets": [],
+  "blocked_affordances": [],
+  "interactive_nodes": 12,
+  "aria_snapshot": "- complementary:\n  - img \"OrgInsights\"\n  - navigation:\n    - button \"Home\"\n    - button \"Assess\"\n    - button \"Reports\"\n    - button \"Plans\"\n    - button \"Admin\"\n  - button \"Open profile\": ST\n- main:\n  - paragraph: Your capability path\n  - heading \"Good evening, SnapshotNeg.\" [level=1]\n  - paragraph: Two focused assessments create one clear five-pillar snapshot.\n  - text: snapshot path\n  - strong: 0%\n  - text: path complete\n  - article:\n    - text: \"01\"\n    - heading \"Self-Assessment\" [level=2]\n    - text: not started\n    - paragraph: 3 questions from each LEADS pillar about you.\n    - button \"Open Self-Assessment\"\n  - article:\n    - text: \"02\"\n    - heading \"OrgInsights assessment\" [level=2]\n    - text: locked\n    - paragraph: Unlocks after your Self-Assessment.\n    - button \"Open OrgInsights assessment\" [disabled]\n  - article:\n    - text: \"03\"\n    - heading \"Snapshot report\" [level=2]\n    - text: locked\n    - paragraph: Your combined, percentage-only pillar results.\n    - button \"Open Snapshot report\" [disabled]\n  - paragraph: Your workspace\n  - heading \"Turn insight into action.\" [level=2]\n  - paragraph: Everything you unlock stays within the same clear path.\n  - button \"Snapshot report Available after both assessment steps\" [disabled]\n  - button \"Plan options Review access options\"\n  - heading \"Start testing from the beginning\" [level=2]\n  - paragraph: Clear this testing profile, its assessments, answers, raters, orders and progress, then return to registration.\n  - button \"Reset testing profile\"",
+  "audit_session_id": "aa54a75b-e544-4e50-a90f-7bd2b4b7f6c9",
+  "readiness": {
+    "desktop": {
+      "settled": true,
+      "settle_ms": 1563,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    },
+    "mobile": {
+      "settled": true,
+      "settle_ms": 1572,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    }
+  },
+  "color_scheme": {
+    "declared": "light",
+    "media_dependent": null,
+    "dark_frame": false
+  },
+  "mobile_ms": 3213.1967259999997,
+  "cold_launch_ms": 469.2309099999999,
+  "desktop_ms": 3351.404542,
+  "browser_launches": 1,
+  "audit_path": "shared-concurrent",
+  "diagnostics": {
+    "audit_path": "shared-concurrent",
+    "concurrent_ran": true,
+    "concurrent_desktop_retry": false,
+    "concurrent_mobile_retry": false,
+    "shared_launch_failed": false,
+    "nav_retries": 0,
+    "settle_retries": 0
+  }
+}

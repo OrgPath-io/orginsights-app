@@ -1,0 +1,114 @@
+{
+  "ok": true,
+  "url": "https://artifact-capture.invalid/spaces/v2/hatch-audit-aa366214-325b-474c-88d5-26eb6e767f60/",
+  "duration_ms": 5787.870199999999,
+  "output_dir": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-08T04-24-43Z-577319858",
+  "nav_status": 200,
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-08T04-24-43Z-577319858/screenshot.png",
+      "fullpage_screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-08T04-24-43Z-577319858/screenshot-full.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-08T04-24-43Z-577319858/screenshot-mobile.png"
+    }
+  },
+  "mobile_layout": {
+    "viewport_width": 390,
+    "scroll_width": 390,
+    "overflow_px": 0,
+    "widest_selector": null,
+    "verdict": "pass"
+  },
+  "horizontal_scrollers": [],
+  "unreachable_controls": {
+    "desktop": [],
+    "mobile": []
+  },
+  "clipped": {
+    "desktop": [],
+    "mobile": []
+  },
+  "images": {
+    "total": 1,
+    "broken": [],
+    "duplicate": [],
+    "unstable": [],
+    "failed_requests": [],
+    "external_blocked": {
+      "count": 0,
+      "sample": []
+    },
+    "sample_urls": [
+      "https://artifact-capture.invalid/spaces/v2/hatch-audit-aa366214-325b-474c-88d5-26eb6e767f60/assets/orginsights-logo-n6rezs15.png"
+    ],
+    "verdict": "pass"
+  },
+  "text_issues": [],
+  "console_errors": [],
+  "console_warnings": [],
+  "external_fetch_failures": 0,
+  "external_fetch_failure_samples": [],
+  "blocked_requests": [],
+  "external_requests": [],
+  "external_requests_dropped": 0,
+  "external_requests_dropped_data_bearing": 0,
+  "transport_ledger_active": true,
+  "egress_lockdown": true,
+  "transport_connections": [
+    {
+      "host": "artifact-capture.invalid",
+      "port": 443,
+      "connects": 2,
+      "bytes_up": 4036,
+      "bytes_down": 2489
+    }
+  ],
+  "transport_udp_attempts": 0,
+  "transport_overflow": 0,
+  "unexplained_transport_hosts": [],
+  "broken_assets": [],
+  "blocked_affordances": [],
+  "interactive_nodes": 13,
+  "aria_snapshot": "- complementary:\n  - img \"OrgInsights\"\n  - navigation:\n    - button \"Home\"\n    - button \"Reports\"\n    - button \"Tools\"\n    - button \"Plans\"\n    - button \"Admin\"\n  - button \"Open profile\": AM\n- main:\n  - paragraph: Your capability path\n  - heading \"Good evening, Akeel.\" [level=1]\n  - paragraph: Two assessments create one clear five-pillar snapshot report.\n  - text: snapshot report path\n  - strong: 100%\n  - text: path complete\n  - article:\n    - text: \"01\"\n    - heading \"Self-Assessment\" [level=2]\n    - text: completed\n    - paragraph: 3 questions from each LEADS pillar about you.\n    - button \"Open Self-Assessment\"\n  - article:\n    - text: \"02\"\n    - heading \"OrgInsights assessment\" [level=2]\n    - text: completed\n    - paragraph: 3 questions per pillar about how you approach work.\n    - button \"Open OrgInsights assessment\"\n  - article:\n    - text: \"03\"\n    - heading \"Snapshot report\" [level=2]\n    - text: ready\n    - paragraph: Your complete 7-page, snapshot-level report is ready.\n    - button \"Open Snapshot report\"\n  - text: Ready to take the full assessment? The full assessment is a separate path with every question.\n  - button \"Start Full Assessment · $99 one-time\"\n  - paragraph: Your workspace\n  - heading \"Turn insight into action.\" [level=2]\n  - paragraph: Everything you unlock stays within the same clear path.\n  - button \"Snapshot report Complete 7-page, five-pillar report\"\n  - button \"Tools & guides Interpret, reflect and plan your next move\"\n  - button \"Plan options Review access options\"\n  - heading \"Start testing from the beginning\" [level=2]\n  - paragraph: Clear this testing profile, its assessments, answers, raters, orders and progress, then return to registration.\n  - button \"Reset testing profile\"",
+  "audit_session_id": "eb7a68d8-f95e-41bb-b2c8-55e497e3977b",
+  "readiness": {
+    "desktop": {
+      "settled": true,
+      "settle_ms": 1815,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    },
+    "mobile": {
+      "settled": true,
+      "settle_ms": 1620,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    }
+  },
+  "color_scheme": {
+    "declared": "light",
+    "media_dependent": null,
+    "dark_frame": false
+  },
+  "mobile_ms": 3534.0532789999997,
+  "cold_launch_ms": 1045.9534520000002,
+  "desktop_ms": 3867.362799,
+  "browser_launches": 1,
+  "audit_path": "shared-concurrent",
+  "diagnostics": {
+    "audit_path": "shared-concurrent",
+    "concurrent_ran": true,
+    "concurrent_desktop_retry": false,
+    "concurrent_mobile_retry": false,
+    "shared_launch_failed": false,
+    "nav_retries": 0,
+    "settle_retries": 0
+  }
+}

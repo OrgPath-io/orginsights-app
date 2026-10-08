@@ -1,0 +1,115 @@
+{
+  "ok": true,
+  "url": "https://artifact-capture.invalid/spaces/v2/hatch-audit-f0d61283-e150-4440-8cfc-5a5aad088974/",
+  "duration_ms": 10349.934995000001,
+  "output_dir": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T05-43-13Z-841808973",
+  "nav_status": 200,
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T05-43-13Z-841808973/screenshot.png",
+      "fullpage_screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T05-43-13Z-841808973/screenshot-full.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T05-43-13Z-841808973/screenshot-mobile.png"
+    }
+  },
+  "mobile_layout": {
+    "viewport_width": 390,
+    "scroll_width": 390,
+    "overflow_px": 0,
+    "widest_selector": null,
+    "verdict": "pass"
+  },
+  "horizontal_scrollers": [],
+  "unreachable_controls": {
+    "desktop": [],
+    "mobile": []
+  },
+  "clipped": {
+    "desktop": [],
+    "mobile": []
+  },
+  "images": {
+    "total": 2,
+    "broken": [],
+    "duplicate": [],
+    "unstable": [],
+    "failed_requests": [],
+    "external_blocked": {
+      "count": 0,
+      "sample": []
+    },
+    "sample_urls": [
+      "https://artifact-capture.invalid/spaces/v2/hatch-audit-f0d61283-e150-4440-8cfc-5a5aad088974/assets/orginsights-logo-n6rezs15.png",
+      "https://artifact-capture.invalid/spaces/v2/hatch-audit-f0d61283-e150-4440-8cfc-5a5aad088974/assets/assessment-options-z249rrkx.jpg"
+    ],
+    "verdict": "pass"
+  },
+  "text_issues": [],
+  "console_errors": [],
+  "console_warnings": [],
+  "external_fetch_failures": 0,
+  "external_fetch_failure_samples": [],
+  "blocked_requests": [],
+  "external_requests": [],
+  "external_requests_dropped": 0,
+  "external_requests_dropped_data_bearing": 0,
+  "transport_ledger_active": true,
+  "egress_lockdown": true,
+  "transport_connections": [
+    {
+      "host": "artifact-capture.invalid",
+      "port": 443,
+      "connects": 2,
+      "bytes_up": 4100,
+      "bytes_down": 2487
+    }
+  ],
+  "transport_udp_attempts": 0,
+  "transport_overflow": 0,
+  "unexplained_transport_hosts": [],
+  "broken_assets": [],
+  "blocked_affordances": [],
+  "interactive_nodes": 9,
+  "aria_snapshot": "- complementary:\n  - img \"OrgInsights\"\n  - navigation:\n    - button \"Home\"\n    - button \"Assess\"\n    - button \"Reports\"\n    - button \"Plans\"\n    - button \"Admin\"\n  - button \"Open profile\": RS\n- main:\n  - paragraph: Choose your tier\n  - heading \"Start with the view you need.\" [level=1]\n  - paragraph: Every paid tier is a one-time purchase. Choose the depth, feedback, and support that fit your next move.\n  - figure \"Start with a focused snapshot, the complete assessment, multi-rater insight, or assessment plus coaching.\":\n    - img \"Professionals reviewing capability assessment options together\"\n    - text: Start with a focused snapshot, the complete assessment, multi-rater insight, or assessment plus coaching.\n  - article:\n    - text: Free Snapshot/Summary $0 free\n    - paragraph: Choose a 7 to 10 minute Snapshot or the 30 to 45 minute Summary. Both include the complete 7-page snapshot report.\n    - list:\n      - listitem: Snapshot or complete Summary questions\n      - listitem: Complete 7-page snapshot-level PDF\n      - listitem: No 360 or career toolkit\n    - button \"Start Snapshot\"\n    - button \"Start Summary\"\n  - button \"Full OrgInsights Assessment $99 one-time The complete 93-question assessment, 11-page detailed report, and career toolkit. Career-tier benchmarks Industry best-fit and learning recommendations AI resume analyzer + development plan\":\n    - text: Full OrgInsights Assessment $99 one-time\n    - paragraph: The complete 93-question assessment, 11-page detailed report, and career toolkit.\n    - list:\n      - listitem: Career-tier benchmarks\n      - listitem: Industry best-fit and learning recommendations\n      - listitem: AI resume analyzer + development plan\n  - button \"Most popular OrgInsights & 360 Assessment $149 one-time Everything in Full Assessment plus 3 to 10 peer and mentor raters. Hidden Talents vs Blind Spots Login-free rater links 7, 14, or 21-day reminders\":\n    - text: Most popular OrgInsights & 360 Assessment $149 one-time\n    - paragraph: Everything in Full Assessment plus 3 to 10 peer and mentor raters.\n    - list:\n      - listitem: Hidden Talents vs Blind Spots\n      - listitem: Login-free rater links\n      - listitem: 7, 14, or 21-day reminders\n  - button \"Assessment & Coaching $199 one-time Everything in the 360 Assessment plus one coaching session. Complete assessment and report Multi-rater Gap Metric One coaching session booking\":\n    - text: Assessment & Coaching $199 one-time\n    - paragraph: Everything in the 360 Assessment plus one coaching session.\n    - list:\n      - listitem: Complete assessment and report\n      - listitem: Multi-rater Gap Metric\n      - listitem: One coaching session booking\n  - region \"Four clear starting points\":\n    - paragraph: At a glance\n    - heading \"Four clear starting points\" [level=2]\n    - table:\n      - rowgroup:\n        - row \"Tier Assessment What it adds\":\n          - columnheader \"Tier\"\n          - columnheader \"Assessment\"\n          - columnheader \"What it adds\"\n      - rowgroup:\n        - 'row \"Free Snapshot: about 7 to 10 min Summary: about 30 to 45 min Complete 7-page snapshot report\"':\n          - rowheader \"Free\"\n          - 'cell \"Snapshot: about 7 to 10 min Summary: about 30 to 45 min\"'\n          - cell \"Complete 7-page snapshot report\"\n        - 'row \"$99 Summary: about 30 to 45 min 11-page detailed report + toolkit\"':\n          - rowheader \"$99\"\n          - 'cell \"Summary: about 30 to 45 min\"'\n          - cell \"11-page detailed report + toolkit\"\n        - 'row \"$149 Summary: about 30 to 45 min Rater assessment: about 15 to 20 min 360 assessment, 3 to 10 raters\"':\n          - rowheader \"$149\"\n          - 'cell \"Summary: about 30 to 45 min Rater assessment: about 15 to 20 min\"'\n          - cell \"360 assessment, 3 to 10 raters\"\n        - 'row \"$199 Summary: about 30 to 45 min Rater assessment: about 15 to 20 min Everything + coaching\"':\n          - rowheader \"$199\"\n          - 'cell \"Summary: about 30 to 45 min Rater assessment: about 15 to 20 min\"'\n          - cell \"Everything + coaching\"\n  - heading \"Start testing from the beginning\" [level=2]\n  - paragraph: Clear this testing profile, its assessments, answers, raters, orders and progress, then return to registration.\n  - button \"Reset testing profile\"",
+  "audit_session_id": "5e660f14-d3d5-47e4-9e53-e94e88944125",
+  "readiness": {
+    "desktop": {
+      "settled": true,
+      "settle_ms": 1775,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    },
+    "mobile": {
+      "settled": true,
+      "settle_ms": 1739,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    }
+  },
+  "color_scheme": {
+    "declared": "light",
+    "media_dependent": null,
+    "dark_frame": false
+  },
+  "mobile_ms": 4131.29322,
+  "cold_launch_ms": 4949.081811,
+  "desktop_ms": 4418.007018,
+  "browser_launches": 1,
+  "audit_path": "shared-concurrent",
+  "diagnostics": {
+    "audit_path": "shared-concurrent",
+    "concurrent_ran": true,
+    "concurrent_desktop_retry": false,
+    "concurrent_mobile_retry": false,
+    "shared_launch_failed": false,
+    "nav_retries": 0,
+    "settle_retries": 0
+  }
+}

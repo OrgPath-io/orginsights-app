@@ -1,0 +1,92 @@
+{
+  "ok": true,
+  "url": "https://artifact-capture.invalid/spaces/v2/hatch-audit-c2f8db42-e083-4e17-b166-65bdf3b325be/",
+  "duration_ms": 7367.491905000001,
+  "output_dir": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-01T07-24-03Z-492514443",
+  "nav_status": 200,
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-01T07-24-03Z-492514443/screenshot.png",
+      "fullpage_screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-01T07-24-03Z-492514443/screenshot-full.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-01T07-24-03Z-492514443/screenshot-mobile.png"
+    }
+  },
+  "mobile_layout": {
+    "viewport_width": 390,
+    "scroll_width": 390,
+    "overflow_px": 0,
+    "widest_selector": null,
+    "verdict": "pass"
+  },
+  "horizontal_scrollers": [],
+  "unreachable_controls": {
+    "desktop": [],
+    "mobile": []
+  },
+  "clipped": {
+    "desktop": [],
+    "mobile": []
+  },
+  "images": {
+    "total": 1,
+    "broken": [],
+    "duplicate": [],
+    "unstable": [],
+    "failed_requests": [],
+    "external_blocked": {
+      "count": 0,
+      "sample": []
+    },
+    "sample_urls": [
+      "https://artifact-capture.invalid/spaces/v2/hatch-audit-c2f8db42-e083-4e17-b166-65bdf3b325be/assets/orginsights-logo-v3zk6fkr.png"
+    ],
+    "verdict": "pass"
+  },
+  "text_issues": [],
+  "console_errors": [],
+  "console_warnings": [],
+  "external_fetch_failures": 0,
+  "external_fetch_failure_samples": [],
+  "blocked_requests": [],
+  "external_requests": [],
+  "external_requests_dropped": 0,
+  "external_requests_dropped_data_bearing": 0,
+  "transport_ledger_active": true,
+  "egress_lockdown": true,
+  "transport_connections": [
+    {
+      "host": "artifact-capture.invalid",
+      "port": 443,
+      "connects": 2,
+      "bytes_up": 4100,
+      "bytes_down": 2486
+    }
+  ],
+  "transport_udp_attempts": 0,
+  "transport_overflow": 0,
+  "unexplained_transport_hosts": [],
+  "broken_assets": [],
+  "blocked_affordances": [],
+  "interactive_nodes": 6,
+  "aria_snapshot": "- img \"OrgInsights\"\n- paragraph: See the capabilities behind your next move.\n- text: 01 Self-assessment 02 Work context 03 360 feedback\n- paragraph: Create your testing profile\n- heading \"Start with what only you can answer.\" [level=1]\n- text: First name\n- textbox \"First name\"\n- text: Last name\n- textbox \"Last name\"\n- text: Email\n- textbox \"Email\"\n- text: Country\n- combobox \"Country\":\n  - option \"Choose a country\"\n  - option \"Afghanistan\"\n  - option \"Albania\"\n  - option \"Algeria\"\n  - option \"American Samoa\"\n  - option \"Andorra\"\n  - option \"Angola\"\n  - option \"Anguilla\"\n  - option \"Antarctica\"\n  - option \"Antigua and Barbuda\"\n  - option \"Argentina\"\n  - option \"Armenia\"\n  - option \"Aruba\"\n  - option \"Australia\"\n  - option \"Austria\"\n  - option \"Azerbaijan\"\n  - option \"Bahamas\"\n  - option \"Bahrain\"\n  - option \"Bangladesh\"\n  - option \"Barbados\"\n  - option \"Belarus\"\n  - option \"Belgium\"\n  - option \"Belize\"\n  - option \"Benin\"\n  - option \"Bermuda\"\n  - option \"Bhutan\"\n  - option \"Bolivia\"\n  - option \"Bonaire, Saint Eustatius and Saba\"\n  - option \"Bosnia and Herzegovina\"\n  - option \"Botswana\"\n  - option \"Bouvet Island\"\n  - option \"Brazil\"\n  - option \"British Indian Ocean Territory\"\n  - option \"British Virgin Islands\"\n  - option \"Brunei\"\n  - option \"Brunei Darussalam\"\n  - option \"Bulgaria\"\n  - option \"Burkina Faso\"\n  - option \"Burundi\"\n  - option \"Cambodia\"\n  - option \"Cameroon\"\n  - option \"Canada\" [selected]\n  - option \"Cape Verde\"\n  - option \"Cayman Islands\"\n  - option \"Central African Republic\"\n  - option \"Chad\"\n  - option \"Chile\"\n  - option \"China\"\n  - option \"Christmas Island\"\n  - option \"Cocos (Keeling) Islands\"\n  - option \"Cocos Islands\"\n  - option \"Colombia\"\n  - option \"Comoros\"\n  - option \"Congo\"\n  - option \"Congo, The Democratic Republic of the\"\n  - option \"Cook Islands\"\n  - option \"Costa Rica\"\n  - option \"Croatia\"\n  - option \"Cuba\"\n  - option \"Curacao\"\n  - option \"Cyprus\"\n  - option \"Czech Republic\"\n  - option \"Côte D'Ivoire\"\n  - option \"Democratic Republic of the Congo\"\n  - option \"Denmark\"\n  - option \"Djibouti\"\n  - option \"Dominica\"\n  - option \"Dominican Republic\"\n  - option \"East Timor\"\n  - option \"Ecuador\"\n  - option \"Egypt\"\n  - option \"El Salvador\"\n  - option \"Equatorial Guinea\"\n  - option \"Eritrea\"\n  - option \"Estonia\"\n  - option \"Ethiopia\"\n  - option \"Falkland Islands\"\n  - option \"Falkland Islands (Malvinas)\"\n  - option \"Faroe Islands\"\n  - option \"Fiji\"\n  - option \"Finland\"\n  - option \"France\"\n  - option \"French Guiana\"\n  - option \"French Polynesia\"\n  - option \"French Southern Territories\"\n  - option \"Gabon\"\n  - option \"Gambia\"\n  - option \"Georgia\"\n  - option \"Germany\"\n  - option \"Ghana\"\n  - option \"Gibraltar\"\n  - option \"Greece\"\n  - option \"Greenland\"\n  - option \"Grenada\"\n  - option \"Guadeloupe\"\n  - option \"Guam\"\n  - option \"Guatemala\"\n  - option \"Guernsey\"\n  - option \"Guinea\"\n  - option \"Guinea-Bissau\"\n  - option \"Guyana\"\n  - option \"Haiti\"\n  - option \"Heard Island and McDonald Islands\"\n  - option \"Holy See (Vatican City)\"\n  - option \"Honduras\"\n  - option \"Hong Kong\"\n  - option \"Hungary\"\n  - option \"Iceland\"\n  - option \"India\"\n  - option \"Indonesia\"\n  - option \"Iran\"\n  - option \"Iran, Islamic Republic of\"\n  - option \"Iraq\"\n  - option \"Ireland\"\n  - option \"Isle of Man\"\n  - option \"Israel\"\n  - option \"Italy\"\n  - option \"Ivory Coast\"\n  - option \"Jamaica\"\n  - option \"Japan\"\n  - option \"Jersey\"\n  - option \"Jordan\"\n  - option \"Kazakhstan\"\n  - option \"Kenya\"\n  - option \"Kiribati\"\n  - option \"Korea, Democratic People's Republic of\"\n  - option \"Korea, Republic of\"\n  - option \"Kosovo\"\n  - option \"Kuwait\"\n  - option \"Kyrgyzstan\"\n  - option \"Lao People's Democratic Republic\"\n  - option \"Laos\"\n  - option \"Latvia\"\n  - option \"Lebanon\"\n  - option \"Lesotho\"\n  - option \"Liberia\"\n  - option \"Libya\"\n  - option \"Libyan Arab Jamahiriya\"\n  - option \"Liechtenstein\"\n  - option \"Lithuania\"\n  - option \"Luxembourg\"\n  - option \"Macao\"\n  - option \"Macedonia\"\n  - option \"Macedonia, The Former Yugoslav Republic of\"\n  - option \"Madagascar\"\n  - option \"Malawi\"\n  - option \"Malaysia\"\n  - option \"Maldives\"\n  - option \"Mali\"\n  - option \"Malta\"\n  - option \"Marshall Islands\"\n  - option \"Martinique\"\n  - option \"Mauritania\"\n  - option \"Mauritius\"\n  - option \"Mayotte\"\n  - option \"Mexico\"\n  - option \"Micronesia\"\n  - option \"Micronesia, Federated States of\"\n  - option \"Moldova\"\n  - option \"Moldova, Republic of\"\n  - option \"Monaco\"\n  - option \"Mongolia\"\n  - option \"Montenegro\"\n  - option \"Montserrat\"\n  - option \"Morocco\"\n  - option \"Mozambique\"\n  - option \"Myanmar\"\n  - option \"Namibia\"\n  - option \"Nauru\"\n  - option \"Nepal\"\n  - option \"Netherlands\"\n  - option \"Netherlands Antilles\"\n  - option \"New Caledonia\"\n  - option \"New Zealand\"\n  - option \"Nicaragua\"\n  - option \"Niger\"\n  - option \"Nigeria\"\n  - option \"Niue\"\n  - option \"Norfolk Island\"\n  - option \"North Korea\"\n  - option \"Northern Mariana Islands\"\n  - option \"Norway\"\n  - option \"Oman\"\n  - option \"Pakistan\"\n  - option \"Palau\"\n  - option \"Palestinian Territory\"\n  - option \"Palestinian Territory, Occupied\"\n  - option \"Panama\"\n  - option \"Papua New Guinea\"\n  - option \"Paraguay\"\n  - option \"Peru\"\n  - option \"Philippines\"\n  - option \"Pitcairn\"\n  - option \"Poland\"\n  - option \"Portugal\"\n  - option \"Puerto Rico\"\n  - option \"Qatar\"\n  - option \"Republic of the Congo\"\n  - option \"Reunion\"\n  - option \"Romania\"\n  - option \"Russia\"\n  - option \"Russian Federation\"\n  - option \"Rwanda\"\n  - option \"Saint Barthélemy\"\n  - option \"Saint Helena\"\n  - option \"Saint Kitts and Nevis\"\n  - option \"Saint Lucia\"\n  - option \"Saint Martin\"\n  - option \"Saint Pierre and Miquelon\"\n  - option \"Saint Vincent and the Grenadines\"\n  - option \"Samoa\"\n  - option \"San Marino\"\n  - option \"Sao Tome and Principe\"\n  - option \"Saudi Arabia\"\n  - option \"Senegal\"\n  - option \"Serbia\"\n  - option \"Seychelles\"\n  - option \"Sierra Leone\"\n  - option \"Singapore\"\n  - option \"Sint Maarten\"\n  - option \"Slovakia\"\n  - option \"Slovenia\"\n  - option \"Solomon Islands\"\n  - option \"Somalia\"\n  - option \"South Africa\"\n  - option \"South Georgia and the South Sandwich Islands\"\n  - option \"South Korea\"\n  - option \"South Sudan\"\n  - option \"Spain\"\n  - option \"Sri Lanka\"\n  - option \"Sudan\"\n  - option \"Suriname\"\n  - option \"Svalbard and Jan Mayen\"\n  - option \"Swaziland\"\n  - option \"Sweden\"\n  - option \"Switzerland\"\n  - option \"Syria\"\n  - option \"Syrian Arab Republic\"\n  - option \"Taiwan\"\n  - option \"Taiwan, Province Of China\"\n  - option \"Tajikistan\"\n  - option \"Tanzania\"\n  - option \"Tanzania, United Republic of\"\n  - option \"Thailand\"\n  - option \"Timor-Leste\"\n  - option \"Togo\"\n  - option \"Tokelau\"\n  - option \"Tonga\"\n  - option \"Trinidad and Tobago\"\n  - option \"Tunisia\"\n  - option \"Turkey\"\n  - option \"Turkmenistan\"\n  - option \"Turks and Caicos Islands\"\n  - option \"Tuvalu\"\n  - option \"U.S. Virgin Islands\"\n  - option \"Uganda\"\n  - option \"Ukraine\"\n  - option \"United Arab Emirates\"\n  - option \"United Kingdom\"\n  - option \"United States\"\n  - option \"United States Minor Outlying Islands\"\n  - option \"Uruguay\"\n  - option \"Uzbekistan\"\n  - option \"Vanuatu\"\n  - option \"Vatican\"\n  - option \"Venezuela\"\n  - option \"Viet Nam\"\n  - option \"Vietnam\"\n  - option \"Virgin Islands, British\"\n  - option \"Virgin Islands, U.S.\"\n  - option \"Wallis And Futuna\"\n  - option \"Western Sahara\"\n  - option \"Yemen\"\n  - option \"Zambia\"\n  - option \"Zimbabwe\"\n  - option \"Åland Islands\"\n- text: Referral or organization code optional\n- textbox \"Referral or organization code optional\"\n- button \"Create profile\"\n- paragraph: This testing build creates one private workspace profile. Authentication and external email delivery are not connected here.",
+  "audit_session_id": "7ff126ff-c143-4c0b-aaa9-950ec819dc8c",
+  "mobile_ms": 5193.718492,
+  "cold_launch_ms": 922.241243,
+  "desktop_ms": 5450.398743,
+  "browser_launches": 1,
+  "audit_path": "shared-concurrent",
+  "diagnostics": {
+    "audit_path": "shared-concurrent",
+    "concurrent_ran": true,
+    "concurrent_desktop_retry": false,
+    "concurrent_mobile_retry": false,
+    "shared_launch_failed": false,
+    "nav_retries": 0
+  }
+}

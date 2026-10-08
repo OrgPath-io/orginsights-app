@@ -1,0 +1,114 @@
+{
+  "ok": true,
+  "url": "https://artifact-capture.invalid/spaces/v2/hatch-audit-f0746dd3-c4f6-4233-b063-4d1db61bbbd9/",
+  "duration_ms": 11560.624725,
+  "output_dir": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T07-16-36Z-984556537",
+  "nav_status": 200,
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T07-16-36Z-984556537/screenshot.png",
+      "fullpage_screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T07-16-36Z-984556537/screenshot-full.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "screenshot_path": "/home/hatch/workspace/ts-spaces/orginsights-app/audits/2026-10-07T07-16-36Z-984556537/screenshot-mobile.png"
+    }
+  },
+  "mobile_layout": {
+    "viewport_width": 390,
+    "scroll_width": 390,
+    "overflow_px": 0,
+    "widest_selector": null,
+    "verdict": "pass"
+  },
+  "horizontal_scrollers": [],
+  "unreachable_controls": {
+    "desktop": [],
+    "mobile": []
+  },
+  "clipped": {
+    "desktop": [],
+    "mobile": []
+  },
+  "images": {
+    "total": 1,
+    "broken": [],
+    "duplicate": [],
+    "unstable": [],
+    "failed_requests": [],
+    "external_blocked": {
+      "count": 0,
+      "sample": []
+    },
+    "sample_urls": [
+      "https://artifact-capture.invalid/spaces/v2/hatch-audit-f0746dd3-c4f6-4233-b063-4d1db61bbbd9/assets/orginsights-logo-n6rezs15.png"
+    ],
+    "verdict": "pass"
+  },
+  "text_issues": [],
+  "console_errors": [],
+  "console_warnings": [],
+  "external_fetch_failures": 0,
+  "external_fetch_failure_samples": [],
+  "blocked_requests": [],
+  "external_requests": [],
+  "external_requests_dropped": 0,
+  "external_requests_dropped_data_bearing": 0,
+  "transport_ledger_active": true,
+  "egress_lockdown": true,
+  "transport_connections": [
+    {
+      "host": "artifact-capture.invalid",
+      "port": 443,
+      "connects": 2,
+      "bytes_up": 4036,
+      "bytes_down": 2487
+    }
+  ],
+  "transport_udp_attempts": 0,
+  "transport_overflow": 0,
+  "unexplained_transport_hosts": [],
+  "broken_assets": [],
+  "blocked_affordances": [],
+  "interactive_nodes": 13,
+  "aria_snapshot": "- complementary:\n  - img \"OrgInsights\"\n  - navigation:\n    - button \"Home\"\n    - button \"Assess\"\n    - button \"360\"\n    - button \"Reports\"\n    - button \"Plans\"\n    - button \"Admin\"\n  - button \"Open profile\": JT\n- main:\n  - paragraph: Your capability path\n  - heading \"Good evening, Journey.\" [level=1]\n  - paragraph: Complete your two sections, then invite trusted raters for a rounded view.\n  - text: 360 path\n  - strong: 0%\n  - text: candidate assessment complete\n  - article:\n    - text: \"01\"\n    - heading \"Complete self assessment\" [level=2]\n    - text: not started\n    - paragraph: Reflect on all Self-Assessment statements.\n    - button \"Open Complete self assessment\"\n  - article:\n    - text: \"02\"\n    - heading \"OrgInsights assessment\" [level=2]\n    - text: locked\n    - paragraph: Unlocks after your self assessment.\n    - button \"Open OrgInsights assessment\" [disabled]\n  - article:\n    - text: \"03\"\n    - heading \"360 feedback\" [level=2]\n    - text: locked\n    - paragraph: Unlocks after both assessment sections are complete.\n    - button \"Open 360 feedback\" [disabled]\n  - paragraph: Your workspace\n  - heading \"Turn insight into action.\" [level=2]\n  - paragraph: Everything you unlock stays within the same clear path.\n  - button \"Detailed report Available after both assessment steps\" [disabled]\n  - button \"Plan options Review access options\"\n  - heading \"Start testing from the beginning\" [level=2]\n  - paragraph: Clear this testing profile, its assessments, answers, raters, orders and progress, then return to registration.\n  - button \"Reset testing profile\"",
+  "audit_session_id": "6acfba97-ca01-45e8-a71d-4867dcb5ee9f",
+  "readiness": {
+    "desktop": {
+      "settled": true,
+      "settle_ms": 3044,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    },
+    "mobile": {
+      "settled": true,
+      "settle_ms": 2889,
+      "in_flight": 0,
+      "network_idle": true,
+      "retried": false
+    }
+  },
+  "color_scheme": {
+    "declared": "light",
+    "media_dependent": null,
+    "dark_frame": false
+  },
+  "mobile_ms": 8781.461693000001,
+  "cold_launch_ms": 1562.7787250000001,
+  "desktop_ms": 8894.367575,
+  "browser_launches": 1,
+  "audit_path": "shared-concurrent",
+  "diagnostics": {
+    "audit_path": "shared-concurrent",
+    "concurrent_ran": true,
+    "concurrent_desktop_retry": false,
+    "concurrent_mobile_retry": false,
+    "shared_launch_failed": false,
+    "nav_retries": 0,
+    "settle_retries": 0
+  }
+}

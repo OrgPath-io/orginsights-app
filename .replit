@@ -1,0 +1,14 @@
+run = "bun run start"
+entrypoint = "server/runtime/server.ts"
+
+[deployment]
+run = ["bun", "run", "start"]
+deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[env]
+DATABASE_PATH = "./data/app.db"
+BLOB_DIR = "./data/blobs"

@@ -1,0 +1,146 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1790834245671,
+      "tag": "0001_initial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790834245671,
+      "tag": "0002_build_assessment_platform",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1790834399041,
+      "tag": "0003_add_free_assessment_mode",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1790920317240,
+      "tag": "0004_add_repcheck_scans",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1791215208791,
+      "tag": "0005_add_clickbank_access_codes",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1791233072734,
+      "tag": "0006_add_reputation_scan_emails",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1791260508052,
+      "tag": "0007_store_assessment_attempt_questions",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1791262168607,
+      "tag": "0008_candidate_lifecycle_email_automation",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1791264678179,
+      "tag": "0009_unlock_coach_referred_profiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1791267660860,
+      "tag": "0010_add_360_rater_communications_and_delivery",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1791269597684,
+      "tag": "0011_seed_rater_communication_templates",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1791270806267,
+      "tag": "0012_add_mail_delivery_diagnostics",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1791276384086,
+      "tag": "0013_add_one_time_pricing_tiers",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1791276665986,
+      "tag": "0014_set_default_coaching_booking_link",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1791296069026,
+      "tag": "0015_seed_snapshot_upgrade_sequence",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "6",
+      "when": 1791315003989,
+      "tag": "0016_add_paid_access_and_assessment_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1791356155401,
+      "tag": "0017_qa_round_features",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1791357281436,
+      "tag": "0018_add_journey_email_controls",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1791444450907,
+      "tag": "0019_qa_round_5_account_referral_demographics_campaigns",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1791483986998,
+      "tag": "0020_fix_calendar_embed_url",
+      "breakpoints": true
+    }
+  ]
+}

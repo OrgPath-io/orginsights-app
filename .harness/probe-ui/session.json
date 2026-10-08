@@ -1,0 +1,8 @@
+{
+  "schema_version": "hatch.probe_ui_session.v1",
+  "socket": "/home/hatch/workspace/ts-spaces/orginsights-app/.harness/probe-ui/sock",
+  "slug": "orginsights-app",
+  "url": "https://artifact-capture.invalid/spaces/v2/hatch-audit-44b4effa-5ad0-41e9-81fe-54bc1b7fcd7c/",
+  "audit_session_id": "e987e188-61fb-46c6-baf7-51d1e59f32c6",
+  "pid": 7201
+}
