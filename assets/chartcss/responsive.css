@@ -1,0 +1,102 @@
+/* Responsive */
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+    
+}
+/* Responsive */
+
+@media only screen and (max-width: 1450px) {
+   
+}/*  (max-width: 1450px) */
+
+@media only screen and (max-width: 1260px) {
+
+} /*  (max-width: 1260px) */
+
+@media only screen and (max-width: 1100px) {
+
+} /*  (max-width: 1100px) */
+
+@media only screen and (max-width: 1199px) {
+
+	.banar_content h1 {font-size: 50px;margin-bottom: 50px;}
+
+	.banar_content p {font-size: 24px;}
+
+	footer.footer_area {font-size: 18px;}
+    
+} /* (max-width: 1199px) */
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+
+} /*  (min-width: 768px) and (max-width: 991px) */
+
+@media only screen and (max-width: 991px) {
+
+	.graph_colTitle {font-size: 14px;min-width: 150px;padding: 30px 10px;}
+
+	.graph_colTitle span {font-size: 28px;}
+
+	.line_title {font-size: 14px;width: 180px;}
+
+
+}/*and (max-width: 991px)*/
+    
+@media only screen and (min-width: 426px) and (max-width: 767px) {
+   
+} /* (min-width: 426px) and (max-width: 767px) */
+      
+@media only screen and (max-width: 767px) {
+
+	.graph_colum {flex-direction: column;border-bottom: 10px solid #fff;}
+
+	.navBrand a {width: 53%;}
+
+	header.header_area {padding: 30px 0 30px 0;}
+
+	section.banar_areac {padding: 110px 0 70px;}
+
+	.banar_content h1 {font-size: 36px;margin-bottom: 30px;}
+
+	.banar_content p {font-size: 18px;}
+
+	footer.footer_area {font-size: 16px;padding: 30px 0;}
+
+	section.graph_section {padding: 60px 0 70px;}
+
+}/* and (max-width: 767px) */
+       
+@media only screen and (max-width: 575px) {
+
+	.graphForm button {font-size: 14px;}
+
+	.select_box {width: calc(50% - 5px);margin-right: 2.5px;margin-left: 2.5px;}
+
+	.select_box select {width: 100%;font-size: 14px;}
+
+	.bottom_btns {margin: 0 -2.5px;}
+
+	.graph_title {display: block;}
+
+} /* (max-width: 575px) */
+    
+@media only screen and (min-width: 320px) and (max-width: 425px) {
+	
+}     /*  (min-width: 320px) and (max-width: 425px) */
+
+@media only screen and (max-width: 480px) {
+
+	.line_title {
+		width: 150px;
+	}
+
+	.graph_colTitle {font-size: 24px;}
+
+	.graph_colTitle span {font-size: 50px;}
+
+} /* (max-width: 480px) */
+      
+@media only screen and (max-width: 360px) {
+
+} /* (max-width: 360px)  */
+   

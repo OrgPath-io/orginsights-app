@@ -1,0 +1,53 @@
+/* #Media Queries
+================================================== */
+/* END__ */
+
+@media (min-width: 992px) and (max-width: 1199px) {
+.categoy-block [class*=col-]{ -ms-flex:0 0 20%; flex:0 0 20%;max-width:20%;}
+} 
+/* END__ */
+
+@media (min-width: 768px) and (max-width: 991px) {
+.page-banner{ text-align:center;}
+.page-banner h1{ float:none; margin-bottom:16px;}
+.page-banner .save-btn{ float:none; display:inline-block;}
+.section{ padding:30px 15px;}
+.categoy-block [class*=col-]{ -ms-flex:0 0 25%; flex:0 0 25%;max-width:25%;}
+.tab-menu li a { text-align:center; padding:10px 50px; line-height:1.2;}
+.tab-menu li a img{ margin:0 auto 12px; display:block; float:none;}
+
+} 
+/* END__ */
+
+@media only screen and (max-width: 767px) {
+body, .form-control, .btn , .dropdown-menu, .input-group-text, .popover-header{ font-size:0.875rem;}
+.btn{ padding:6px 15px;}
+h1, .h1 {font-size:1.875rem;}
+h2, .h2 {font-size:1.6875rem;}
+h3, .h3 {font-size:1.4375rem;}
+h4, .h4 {font-size:1.25rem;}
+h5, .h5, .assessment-list .list-item h4 {font-size:1.125rem;}
+h6, .h6 {font-size:1rem;}
+.header{ padding:15px 0;}
+.header [class*=col-]:nth-child(4){ font-size:18px; color:#126aaf; text-align:center; margin-top:15px;}
+.page-banner{ text-align:center;}
+.page-banner h1{ float:none; margin-bottom:16px;}
+.page-banner .save-btn{ float:none; display:inline-block;}
+.tab-menu li a { font-size:14px; text-align:center; padding:10px; line-height:1.2;}
+.tab-menu li a img{ margin:0 auto 12px; display:block; float:none;}
+.section{ padding:30px 15px;}
+/*.categoy-block [class*=col-]{ -ms-flex:0 0 50%; flex:0 0 50%;max-width:50%;}*/
+.categoy-block [class*=col-]{ -ms-flex:0 0 50%; flex:0 0 51%;max-width:51%;}
+.assessment-list .list-item{ padding:20px 20px 20px 70px;}
+.assessment-list .list-item ul li{ display:block;}
+.assessment-list .list-item ul li + li{ margin:6px 0 0 0}
+.bottom-checkbox .container{ padding-left:30px; padding-right:30px;}
+.btn-div .btn{ display:block; width:100%; margin:0;}
+.btn-div .btn + .btn{ margin-top:20px;}
+} 
+/* END__ */
+
+@media (max-width: 480px) {
+} 
+/* END__ */
+

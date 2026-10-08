@@ -1,0 +1,92 @@
+<?php return array (
+  'sans-serif' => array(
+    'normal' => $fontDir . '/Helvetica',
+    'bold' => $fontDir . '/Helvetica-Bold',
+    'italic' => $fontDir . '/Helvetica-Oblique',
+    'bold_italic' => $fontDir . '/Helvetica-BoldOblique',
+  ),
+  'times' => array(
+    'normal' => $fontDir . '/Times-Roman',
+    'bold' => $fontDir . '/Times-Bold',
+    'italic' => $fontDir . '/Times-Italic',
+    'bold_italic' => $fontDir . '/Times-BoldItalic',
+  ),
+  'times-roman' => array(
+    'normal' => $fontDir . '/Times-Roman',
+    'bold' => $fontDir . '/Times-Bold',
+    'italic' => $fontDir . '/Times-Italic',
+    'bold_italic' => $fontDir . '/Times-BoldItalic',
+  ),
+  'courier' => array(
+    'normal' => $fontDir . '/Courier',
+    'bold' => $fontDir . '/Courier-Bold',
+    'italic' => $fontDir . '/Courier-Oblique',
+    'bold_italic' => $fontDir . '/Courier-BoldOblique',
+  ),
+  'helvetica' => array(
+    'normal' => $fontDir . '/Helvetica',
+    'bold' => $fontDir . '/Helvetica-Bold',
+    'italic' => $fontDir . '/Helvetica-Oblique',
+    'bold_italic' => $fontDir . '/Helvetica-BoldOblique',
+  ),
+  'zapfdingbats' => array(
+    'normal' => $fontDir . '/ZapfDingbats',
+    'bold' => $fontDir . '/ZapfDingbats',
+    'italic' => $fontDir . '/ZapfDingbats',
+    'bold_italic' => $fontDir . '/ZapfDingbats',
+  ),
+  'symbol' => array(
+    'normal' => $fontDir . '/Symbol',
+    'bold' => $fontDir . '/Symbol',
+    'italic' => $fontDir . '/Symbol',
+    'bold_italic' => $fontDir . '/Symbol',
+  ),
+  'serif' => array(
+    'normal' => $fontDir . '/Times-Roman',
+    'bold' => $fontDir . '/Times-Bold',
+    'italic' => $fontDir . '/Times-Italic',
+    'bold_italic' => $fontDir . '/Times-BoldItalic',
+  ),
+  'monospace' => array(
+    'normal' => $fontDir . '/Courier',
+    'bold' => $fontDir . '/Courier-Bold',
+    'italic' => $fontDir . '/Courier-Oblique',
+    'bold_italic' => $fontDir . '/Courier-BoldOblique',
+  ),
+  'fixed' => array(
+    'normal' => $fontDir . '/Courier',
+    'bold' => $fontDir . '/Courier-Bold',
+    'italic' => $fontDir . '/Courier-Oblique',
+    'bold_italic' => $fontDir . '/Courier-BoldOblique',
+  ),
+  'dejavu sans' => array(
+    'bold' => $fontDir . '/DejaVuSans-Bold',
+    'bold_italic' => $fontDir . '/DejaVuSans-BoldOblique',
+    'italic' => $fontDir . '/DejaVuSans-Oblique',
+    'normal' => $fontDir . '/DejaVuSans',
+  ),
+  'dejavu sans mono' => array(
+    'bold' => $fontDir . '/DejaVuSansMono-Bold',
+    'bold_italic' => $fontDir . '/DejaVuSansMono-BoldOblique',
+    'italic' => $fontDir . '/DejaVuSansMono-Oblique',
+    'normal' => $fontDir . '/DejaVuSansMono',
+  ),
+  'dejavu serif' => array(
+    'bold' => $fontDir . '/DejaVuSerif-Bold',
+    'bold_italic' => $fontDir . '/DejaVuSerif-BoldItalic',
+    'italic' => $fontDir . '/DejaVuSerif-Italic',
+    'normal' => $fontDir . '/DejaVuSerif',
+  ),
+  'roboto' => array(
+    '300' => $fontDir . '/roboto_300_d4c0267db2aab4066cff45f83a6b1c96',
+    'normal' => $fontDir . '/roboto_normal_ea8a516f74db1359b3df4ecad83b7f3b',
+    '500' => $fontDir . '/roboto_500_5f9df759bbe37a113d7d94b26335edef',
+    'bold' => $fontDir . '/roboto_bold_5de0bf436581c52a65958c3e004cf0a1',
+  ),
+  'montserrat' => array(
+    '300' => $fontDir . '/montserrat_300_0225255b278d03ef0143f6fb376c6a83',
+    'normal' => $fontDir . '/montserrat_normal_8c5704757347a4d33ace16852eb0c0d5',
+    '500' => $fontDir . '/montserrat_500_f99c806a7c955d6cafe5ed7742c302d3',
+    'bold' => $fontDir . '/montserrat_bold_d95ba42936b46f5f8344e8297169c6b2',
+  ),
+) ?>

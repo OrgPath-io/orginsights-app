@@ -1,0 +1,11 @@
+<?php 
+/*
+//test keys
+define("STRIPE_SECRET_KEY", "sk_test_51HUYyZHb6bIIIw4t6aMqBdrcCdx30aVvQcbiIHbaAqLynb6AebJ9pNOlDow1hDhEDAOFyaSpP5yuyl43Jph0vAdY00dx3FZrK7");
+define("STRIPE_PUBLISHABLE_KEY", "pk_test_51HUYyZHb6bIIIw4tR9got47AYhkaDlesaihLa14z0JwEmTdqVN4XIrBogIQMegpR64x6Lfhe7EsCGB968ULNxPfx00TjlSkiTy");
+*/
+
+//live keys
+define("STRIPE_SECRET_KEY", "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");
+define("STRIPE_PUBLISHABLE_KEY", "pk_live_51HUYyZHb6bIIIw4t8O2Yt37g1tc7Ln3Z5JPoSmiCsJog47Oepl3zxW4t67HTLdyedt03tAx3VBUYBwHBStA568Jw00OJosebYN");
+?>
