@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { readFile, rm } from "node:fs/promises";
+import { spawn, type ChildProcess } from "node:child_process";
 import { definePrivilegedContracts, definePrivilegedHandlers, z } from "@hatch/space-sdk";
 import nodemailer from "nodemailer";
 import { renderOriginalReportHtml, type TemplateInput } from "./report-template";
@@ -32,7 +33,8 @@ async function renderWithChromium(html: string): Promise<string> {
   const chrome = ["/opt/meta-chromium/chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser", "/usr/bin/google-chrome"].find(existsSync);
   if (!chrome) throw new Error("Headless Chromium is not installed in the web artifact runtime.");
   const profileDir = `/tmp/orginsights-pdf-${crypto.randomUUID()}`;
-  const process = Bun.spawn([chrome, "--headless=new", "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage", "--disable-background-networking", "--no-first-run", "--remote-debugging-port=0", `--user-data-dir=${profileDir}`, "about:blank"], { stdin: "ignore", stdout: "ignore", stderr: "ignore" });
+  const process: ChildProcess = spawn(chrome, ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage", "--disable-background-networking", "--no-first-run", "--remote-debugging-port=0", `--user-data-dir=${profileDir}`, "about:blank"], { stdio: "ignore" });
+  const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
   let socket: WebSocket | null = null;
   try {
     let socketUrl = "";
@@ -43,7 +45,7 @@ async function renderWithChromium(html: string): Promise<string> {
       } catch {
         // Chromium needs a short startup window before DevTools is ready.
       }
-      await Bun.sleep(100);
+      await sleep(100);
     }
     if (!socketUrl) throw new Error("Headless Chromium started but its print interface was unavailable.");
     socket = new WebSocket(socketUrl);
@@ -79,8 +81,22 @@ async function renderWithChromium(html: string): Promise<string> {
     return result.data;
   } finally {
     socket?.close();
-    process.kill();
-    await process.exited.catch(() => undefined);
+    try {
+      process.kill();
+    } catch {
+      // Process may have already exited.
+    }
+    await new Promise<void>((resolve) => {
+      if (process.exitCode !== null || process.signalCode !== null) {
+        resolve();
+        return;
+      }
+      const timer = setTimeout(resolve, 5000);
+      process.once("exit", () => {
+        clearTimeout(timer);
+        resolve();
+      });
+    });
     await rm(profileDir, { recursive: true, force: true }).catch(() => undefined);
   }
 }
