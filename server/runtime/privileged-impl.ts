@@ -57,14 +57,23 @@ export const privilegedContracts = {
 type CdpReply = { id?: number; result?: unknown; error?: { message?: string } };
 
 async function renderWithChromium(html: string): Promise<string> {
-  // Use Puppeteer's bundled Chromium if available, fallback to system paths
+  // Use @sparticuz/chromium (serverless-optimized) if available, then Puppeteer, then system paths
   let chrome: string | undefined;
   try {
-    const puppeteer = await import("puppeteer");
-    chrome = puppeteer.executablePath();
+    const chromium = await import("@sparticuz/chromium");
+    chrome = await chromium.default.executablePath();
     if (chrome && !existsSync(chrome)) chrome = undefined;
   } catch {
-    // Puppeteer not available, try system paths
+    // @sparticuz/chromium not available
+  }
+  if (!chrome) {
+    try {
+      const puppeteer = await import("puppeteer");
+      chrome = puppeteer.executablePath();
+      if (chrome && !existsSync(chrome)) chrome = undefined;
+    } catch {
+      // Puppeteer not available
+    }
   }
   if (!chrome) {
     chrome = [

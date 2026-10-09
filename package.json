@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@sparticuz/chromium": "^153.0.0",
     "@tanstack/react-query": "5.100.10",
     "@types/nodemailer": "^8.0.2",
     "better-sqlite3": "^13.0.3",
@@ -7,6 +8,7 @@
     "express": "^4.21.2",
     "nodemailer": "^10.0.15",
     "puppeteer": "^25.13.0",
+    "puppeteer-core": "^25.13.0",
     "react": "19.2.5",
     "react-dom": "19.2.5",
     "recharts": "2.15.3",
