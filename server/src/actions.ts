@@ -1174,20 +1174,24 @@ export const Actions = {
     ctx.invalidateQueries();
     return { ok: true, message: "Your full summary is ready. Snapshot answers were cleared so you can begin again with every question." };
   }}),
-  startNewAssessmentAttempt: defineAction({ request: z.object({ profileId: z.number().int() }), response: okResponse, async handler(ctx, a) {
+  startNewAssessmentAttempt: defineAction({ request: z.object({ profileId: z.number().int(), mode: z.enum(["summary", "360"]).optional() }), response: okResponse, async handler(ctx, a) {
     const db = ctx.db<typeof s>();
     const profileRows = await db.select().from(s.profiles).where(eq(s.profiles.id, a.profileId)).limit(1);
     const profile = profileRows[0];
     if (!profile || !paidAccessActive(profile)) return { ok: false, message: "Active paid access is required to start another assessment." };
+    const requestedMode = a.mode ?? "summary";
+    if (requestedMode === "360" && !has360Access(profile.plan)) return { ok: false, message: "Active 360 access is required to start a 360 assessment." };
     const rows = await db.select().from(s.assessments).where(eq(s.assessments.profileId, a.profileId));
-    if (rows.some((row) => row.status !== "completed")) return { ok: false, message: "Finish the current OrgInsights attempt before starting another of the same type." };
+    if (rows.some((row) => row.status !== "completed")) return { ok: false, message: "Finish the current assessment before starting a new one. Only one assessment can run at a time." };
     const currentGroup = Math.max(0, ...rows.map((row) => row.attemptGroup));
     await archiveCompletedAttempt(ctx, a.profileId, currentGroup);
     const nextGroup = currentGroup + 1;
     await db.insert(s.assessments).values([{ profileId: a.profileId, attemptGroup: nextGroup, kind: "self", status: "not_started" }, { profileId: a.profileId, attemptGroup: nextGroup, kind: "professional", status: "not_started" }]);
-    await addAudit(ctx, "Started new assessment attempt", "profile", `Profile ${a.profileId} · attempt ${nextGroup}`);
+    await db.update(s.profiles).set({ assessmentMode: requestedMode }).where(eq(s.profiles.id, a.profileId));
+    if (requestedMode === "360") await db.insert(s.raterCampaigns).values({ profileId: a.profileId, status: "draft", reminderDays: 7, createdAt: now() }).onConflictDoNothing();
+    await addAudit(ctx, "Started new assessment attempt", "profile", `Profile ${a.profileId} · attempt ${nextGroup} · mode ${requestedMode}`);
     ctx.invalidateQueries();
-    return { ok: true, message: "A new assessment attempt is ready. Your earlier results remain in History." };
+    return { ok: true, message: requestedMode === "360" ? "A new 360 assessment is ready. Complete both sections, then invite your raters." : "A new OrgInsights assessment is ready. Your earlier results remain in History." };
   }}),
   checkout: defineAction({ request: z.object({ profileId:z.number().int(), item:z.enum(["full","360","coaching","additional_coaching"]), code:z.string().optional() }), response: anyResponse, async handler(ctx,a) {
     const db=ctx.db<typeof s>();
