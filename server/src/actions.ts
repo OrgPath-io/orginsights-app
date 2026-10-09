@@ -782,11 +782,11 @@ export const Actions = {
     await reconcileCandidateEmails(ctx);
     const smtp = await ensureSmtpConfiguration(ctx);
     const allProfiles = await db.select().from(s.profiles).orderBy(desc(s.profiles.createdAt));
-    // Use session profile if available, otherwise fall back to latest (for backward compat)
+    // Use session profile only. No fallback to latest profile (that leaked other users' data).
     const sessionProfileId = ctx.sessionProfileId;
     const profile = sessionProfileId
       ? allProfiles.find(p => p.id === sessionProfileId) ?? null
-      : allProfiles[0] ?? null;
+      : null;
     const [countries, capabilities, categories, questions, options, codes, accessCodes, orders, mail, audit, settings, allAssessments, allRaters, emailTemplates, candidateEmails, raterCampaigns, raterEmailTemplates, raterEmails] = await Promise.all([
       db.select().from(s.countries).orderBy(asc(s.countries.name)), db.select().from(s.capabilities).orderBy(asc(s.capabilities.id)), db.select().from(s.categories).orderBy(asc(s.categories.id)), db.select().from(s.questions).orderBy(asc(s.questions.id)), db.select().from(s.responseOptions).orderBy(asc(s.responseOptions.id)), db.select().from(s.referralCodes).orderBy(desc(s.referralCodes.id)), db.select().from(s.accessCodes).orderBy(desc(s.accessCodes.id)).limit(200), db.select().from(s.orders).orderBy(desc(s.orders.id)), db.select().from(s.mailEvents).orderBy(desc(s.mailEvents.id)).limit(50), db.select().from(s.auditLog).orderBy(desc(s.auditLog.id)).limit(50), db.select().from(s.settings), db.select().from(s.assessments).orderBy(desc(s.assessments.id)), db.select().from(s.raters).orderBy(desc(s.raters.id)), db.select().from(s.emailTemplates).orderBy(asc(s.emailTemplates.id)), db.select().from(s.candidateEmails).orderBy(desc(s.candidateEmails.scheduledAt)), db.select().from(s.raterCampaigns).orderBy(desc(s.raterCampaigns.id)), db.select().from(s.raterEmailTemplates).orderBy(asc(s.raterEmailTemplates.id)), db.select().from(s.raterEmails).orderBy(desc(s.raterEmails.scheduledAt)),
     ]);
