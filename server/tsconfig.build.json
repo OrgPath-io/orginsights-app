@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noImplicitAny": false,
+    "strict": false,
+    "tsBuildInfoFile": "./.tsbuildinfo.server.build"
+  },
+  "include": ["src/**/*", "runtime/**/*"]
+}
