@@ -32,6 +32,13 @@ function bytesToBase64(bytes: Uint8Array) {
   return btoa(binary);
 }
 
+function base64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
 async function sha256(value: string) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return bytesToBase64(new Uint8Array(digest));
@@ -42,6 +49,22 @@ async function hashPassword(password: string) {
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
   const derived = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations: PASSWORD_HASH_ITERATIONS }, key, 256);
   return `pbkdf2-sha256$${PASSWORD_HASH_ITERATIONS}$${bytesToBase64(salt)}$${bytesToBase64(new Uint8Array(derived))}`;
+}
+
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  try {
+    const parts = hash.split("$");
+    if (parts.length !== 4 || parts[0] !== "pbkdf2-sha256") return false;
+    const iterations = parseInt(parts[1], 10);
+    const salt = base64ToBytes(parts[2]);
+    const expected = parts[3];
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+    const derived = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations }, key, 256);
+    const actual = bytesToBase64(new Uint8Array(derived));
+    return actual === expected;
+  } catch {
+    return false;
+  }
 }
 
 function resetLink(baseUrl: string, token: string) {
@@ -899,6 +922,23 @@ export const Actions = {
     if (ctx.setSession) await ctx.setSession(profile.id);
     return { ok: true, message: accessCode ? "Access code accepted. Your $99 Full Assessment tier is unlocked." : freeCoachAccess ? `Coach code accepted. Your ${coachTier === "360" ? "$149 360 Assessment" : "$99 Full Assessment"} tier is unlocked with no checkout.` : coachCode ? "Coach code accepted. Complete the one-time checkout for your assigned tier." : "Profile created." };
   }}),
+  login: defineAction({ request: z.object({ email: z.string().email(), password: z.string().min(1).max(128) }), response: okResponse, async handler(ctx, a) {
+    const db = ctx.db<typeof s>();
+    const profiles = await db.select().from(s.profiles).where(eq(s.profiles.email, a.email.trim().toLowerCase())).limit(1);
+    const profile = profiles[0];
+    if (!profile || !profile.passwordHash) return { ok: false, message: "Invalid email or password." };
+    const valid = await verifyPassword(a.password, profile.passwordHash);
+    if (!valid) return { ok: false, message: "Invalid email or password." };
+    if (ctx.setSession) await ctx.setSession(profile.id);
+    await addAudit(ctx, "Signed in", "profile", `Profile ${profile.id}`);
+    ctx.invalidateQueries();
+    return { ok: true, message: "Signed in successfully." };
+  }}),
+  logout: defineAction({ request: z.object({}), response: okResponse, async handler(ctx) {
+    if (ctx.clearSession) ctx.clearSession();
+    ctx.invalidateQueries();
+    return { ok: true, message: "Signed out." };
+  }}),
   setAssessmentMode: defineAction({ request:z.object({profileId:z.number().int(),mode:z.enum(["snapshot","summary","360"])}),response:okResponse,async handler(ctx,a){const db=ctx.db<typeof s>();const rows=await db.select().from(s.profiles).where(eq(s.profiles.id,a.profileId)).limit(1);const profile=rows[0];if(!profile)return{ok:false,message:"Profile not found."};if(a.mode==="snapshot"&&profile.referralCode){const codes=await db.select().from(s.referralCodes).where(eq(s.referralCodes.code,profile.referralCode.toUpperCase())).limit(1);if(codes[0]?.isCoachCode)return{ok:false,message:"Coach pathways include the full assessment. Choose OrgInsights assessment or 360 assessment."};}await db.update(s.profiles).set({assessmentMode:a.mode}).where(eq(s.profiles.id,a.profileId));if(a.mode==="360")await db.insert(s.raterCampaigns).values({profileId:a.profileId,status:"draft",reminderDays:7,createdAt:now()}).onConflictDoNothing();await addAudit(ctx,"Selected assessment path","profile",a.mode);ctx.invalidateQueries();return{ok:true,message:a.mode==="snapshot"?"Snapshot assessment selected.":a.mode==="360"?"360 assessment selected. Complete both candidate sections, then invite 3 to 10 raters.":"OrgInsights assessment selected."};}}),
   resetTestingProfile: defineAction({ request: z.object({ profileId: z.number().int() }), response: okResponse, async handler(ctx, a) {
     const db = ctx.db<typeof s>();
@@ -1422,7 +1462,7 @@ export const Actions = {
   updateQuestion: defineAction({request:z.object({callerProfileId:z.number().int(),id:z.number().int(),prompt:z.string().min(1),instruction:z.string(),track:z.string().min(1),categoryId:z.number().int(),capabilityId:z.number().int(),status:z.enum(["live","draft"])}),response:okResponse,async handler(ctx,a){if(!(await requireAdmin(ctx,a.callerProfileId)))return adminUnauthorized;const db=ctx.db<typeof s>();await db.update(s.questions).set({prompt:a.prompt,instruction:a.instruction,track:a.track,categoryId:a.categoryId,capabilityId:a.capabilityId,status:a.status}).where(eq(s.questions.id,a.id));await addAudit(ctx,"Updated question","question",`#${a.id}`);ctx.invalidateQueries();return{ok:true,message:"Question updated."};}}),
   deleteQuestion: defineAction({request:z.object({callerProfileId:z.number().int(),id:z.number().int()}),response:okResponse,async handler(ctx,a){if(!(await requireAdmin(ctx,a.callerProfileId)))return adminUnauthorized;const db=ctx.db<typeof s>();await db.batch([db.delete(s.answers).where(eq(s.answers.questionId,a.id)),db.delete(s.raterAnswers).where(eq(s.raterAnswers.questionId,a.id)),db.delete(s.assessmentQuestions).where(eq(s.assessmentQuestions.questionId,a.id)),db.delete(s.responseOptions).where(eq(s.responseOptions.questionId,a.id)),db.delete(s.questions).where(eq(s.questions.id,a.id))]);await addAudit(ctx,"Deleted question","question",`#${a.id}`);ctx.invalidateQueries();return{ok:true,message:"Question deleted."};}}),
   forgotPassword: defineAction({request:z.object({email:z.string().email()}),response:okResponse,privileged:[privileged.loadLegacySmtpConfiguration,privileged.sendSmtpMail],async handler(ctx,a){const db=ctx.db<typeof s>();await ensureEmailTemplates(ctx);const profiles=await db.select().from(s.profiles).where(eq(s.profiles.email,a.email.trim().toLowerCase())).limit(1);const profile=profiles[0];if(profile){const request=await createPasswordResetRequest(ctx,profile);const templates=await db.select().from(s.emailTemplates).where(eq(s.emailTemplates.templateKey,"forgot_password")).limit(1);const template=templates[0];if(template){const eventKey=`password-reset-${request.requestId}`;await scheduleCandidateEmail(ctx,profile,template,now(),null,false,{reset_url:request.url},null,eventKey);await deliverCandidateEmailNow(ctx,profile,"forgot_password",eventKey);}await addAudit(ctx,"Requested password reset","profile",`Profile ${profile.id}`);}ctx.invalidateQueries();return{ok:true,message:"If an OrgInsights account matches that email, a one-hour reset link has been sent."};}}),
-  resetPassword: defineAction({request:z.object({token:z.string().min(20),password:z.string().min(8).max(128)}),response:okResponse,async handler(ctx,a){const db=ctx.db<typeof s>();const token=await sha256(a.token);const requests=await db.select().from(s.passwordResetRequests).where(and(eq(s.passwordResetRequests.token,token),sql`${s.passwordResetRequests.usedAt} is null`)).limit(1);const request=requests[0];if(!request||request.expiresAt.getTime()<=Date.now())return{ok:false,message:"This reset link is invalid or has expired. Request a new one."};const passwordHash=await hashPassword(a.password);const stamp=now();await db.batch([db.update(s.profiles).set({passwordHash,passwordUpdatedAt:stamp}).where(eq(s.profiles.id,request.profileId)),db.update(s.passwordResetRequests).set({usedAt:stamp}).where(eq(s.passwordResetRequests.profileId,request.profileId))]);await addAudit(ctx,"Reset password","profile",`Profile ${request.profileId} used a secure reset link`);ctx.invalidateQueries();return{ok:true,message:"Your password has been updated. You can return to OrgInsights."};}}),
+  resetPassword: defineAction({request:z.object({token:z.string().min(20),password:z.string().min(8).max(128)}),response:okResponse,async handler(ctx,a){const db=ctx.db<typeof s>();const token=await sha256(a.token);const requests=await db.select().from(s.passwordResetRequests).where(and(eq(s.passwordResetRequests.token,token),sql`${s.passwordResetRequests.usedAt} is null`)).limit(1);const request=requests[0];if(!request||request.expiresAt.getTime()<=Date.now())return{ok:false,message:"This reset link is invalid or has expired. Request a new one."};const passwordHash=await hashPassword(a.password);const stamp=now();await db.batch([db.update(s.profiles).set({passwordHash,passwordUpdatedAt:stamp}).where(eq(s.profiles.id,request.profileId)),db.update(s.passwordResetRequests).set({usedAt:stamp}).where(eq(s.passwordResetRequests.profileId,request.profileId))]);await addAudit(ctx,"Reset password","profile",`Profile ${request.profileId} used a secure reset link`);if(ctx.setSession)await ctx.setSession(request.profileId);ctx.invalidateQueries();return{ok:true,message:"Your password has been updated. You are now signed in."};}}),
   updatePassword: defineAction({request:z.object({profileId:z.number().int(),password:z.string().min(8).max(128)}),response:okResponse,async handler(ctx,a){const db=ctx.db<typeof s>();const profiles=await db.select({id:s.profiles.id}).from(s.profiles).where(eq(s.profiles.id,a.profileId)).limit(1);if(!profiles[0])return{ok:false,message:"Profile not found."};const stamp=now();await db.batch([db.update(s.profiles).set({passwordHash:await hashPassword(a.password),passwordUpdatedAt:stamp}).where(eq(s.profiles.id,a.profileId)),db.update(s.passwordResetRequests).set({usedAt:stamp}).where(and(eq(s.passwordResetRequests.profileId,a.profileId),sql`${s.passwordResetRequests.usedAt} is null`))]);await addAudit(ctx,"Updated password","profile",`Profile ${a.profileId}`);ctx.invalidateQueries();return{ok:true,message:"Password updated."};}}),
   adminManagePassword: defineAction({request:z.object({callerProfileId:z.number().int(),profileId:z.number().int(),mode:z.enum(["reset","change"]),password:z.string().max(128).optional(),notify:z.boolean()}),response:adminPasswordResponse,privileged:[privileged.loadLegacySmtpConfiguration,privileged.sendSmtpMail],async handler(ctx,a):Promise<z.infer<typeof adminPasswordResponse>>{if(!(await requireAdmin(ctx,a.callerProfileId)))return{ok:false,message:"Unauthorized"};const db=ctx.db<typeof s>();const profiles=await db.select().from(s.profiles).where(eq(s.profiles.id,a.profileId)).limit(1);const profile=profiles[0];if(!profile)return{ok:false,message:"User not found."};await ensureEmailTemplates(ctx);if(a.mode==="change"){if(!a.password||a.password.length<8)return{ok:false,message:"Enter a password with at least 8 characters."};const stamp=now();await db.batch([db.update(s.profiles).set({passwordHash:await hashPassword(a.password),passwordUpdatedAt:stamp}).where(eq(s.profiles.id,profile.id)),db.update(s.passwordResetRequests).set({usedAt:stamp}).where(and(eq(s.passwordResetRequests.profileId,profile.id),sql`${s.passwordResetRequests.usedAt} is null`))]);if(a.notify){const templates=await db.select().from(s.emailTemplates).where(eq(s.emailTemplates.templateKey,"password_changed")).limit(1);const template=templates[0];if(template){const eventKey=`admin-password-change-${stamp.getTime()}`;await scheduleCandidateEmail(ctx,profile,template,stamp,null,false,{},null,eventKey);await deliverCandidateEmailNow(ctx,profile,"password_changed",eventKey);}}await addAudit(ctx,"Administrator changed password","profile",`Profile ${profile.id} · notification ${a.notify?"requested":"suppressed"}`);ctx.invalidateQueries();return{ok:true,message:a.notify?"Password changed and notification processed.":"Password changed silently."};}const request=await createPasswordResetRequest(ctx,profile);if(a.notify){const templates=await db.select().from(s.emailTemplates).where(eq(s.emailTemplates.templateKey,"forgot_password")).limit(1);const template=templates[0];if(template){const eventKey=`admin-password-reset-${request.requestId}`;await scheduleCandidateEmail(ctx,profile,template,now(),null,false,{reset_url:request.url},null,eventKey);await deliverCandidateEmailNow(ctx,profile,"forgot_password",eventKey);}}await addAudit(ctx,"Administrator created password reset","profile",`Profile ${profile.id} · notification ${a.notify?"requested":"suppressed"}`);ctx.invalidateQueries();return{ok:true,message:a.notify?"Reset link created and email processed.":"Silent reset link created for testing.",...(a.notify?{}:{resetUrl:request.url})};}}),
   updateProfile: defineAction({request:z.object({profileId:z.number().int(),firstName:z.string().min(1),lastName:z.string().min(1),email:z.string().email(),country:z.string().min(1)}),response:okResponse,async handler(ctx,a){const db=ctx.db<typeof s>();await db.update(s.profiles).set({firstName:a.firstName.trim(),lastName:a.lastName.trim(),email:a.email.trim().toLowerCase(),country:a.country}).where(eq(s.profiles.id,a.profileId));await addAudit(ctx,"Updated account profile","profile",`Profile ${a.profileId}`);ctx.invalidateQueries();return{ok:true,message:"Profile updated."};}}),
