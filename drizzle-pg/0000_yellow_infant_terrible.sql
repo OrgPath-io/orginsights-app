@@ -1,5 +1,5 @@
 CREATE TABLE "access_codes" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"code" text NOT NULL,
 	"source" text DEFAULT 'clickbank' NOT NULL,
 	"status" text DEFAULT 'unused' NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE "access_codes" (
 );
 --> statement-breakpoint
 CREATE TABLE "answers" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"assessment_id" integer NOT NULL,
 	"question_id" integer NOT NULL,
 	"option_id" integer NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE "answers" (
 );
 --> statement-breakpoint
 CREATE TABLE "assessment_history" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"attempt_group" integer NOT NULL,
 	"mode" text NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE "assessment_history" (
 );
 --> statement-breakpoint
 CREATE TABLE "assessment_questions" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"assessment_id" integer NOT NULL,
 	"question_id" integer NOT NULL,
 	"display_order" integer NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE "assessment_questions" (
 );
 --> statement-breakpoint
 CREATE TABLE "assessments" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"attempt_group" integer DEFAULT 1 NOT NULL,
 	"kind" text NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE "assessments" (
 );
 --> statement-breakpoint
 CREATE TABLE "audit_log" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"actor" text NOT NULL,
 	"action" text NOT NULL,
 	"entity" text NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE "audit_log" (
 );
 --> statement-breakpoint
 CREATE TABLE "candidate_emails" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"assessment_id" integer,
 	"template_key" text NOT NULL,
@@ -80,27 +80,27 @@ CREATE TABLE "candidate_emails" (
 );
 --> statement-breakpoint
 CREATE TABLE "capabilities" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
 	"active" boolean NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "categories" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
 	"active" boolean NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "countries" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"code" text NOT NULL,
 	"name" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "email_templates" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"template_key" text NOT NULL,
 	"name" text NOT NULL,
 	"enabled" boolean DEFAULT true NOT NULL,
@@ -118,7 +118,7 @@ CREATE TABLE "email_templates" (
 );
 --> statement-breakpoint
 CREATE TABLE "industry_capabilities" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"industry_name" text NOT NULL,
 	"category_id" integer NOT NULL,
 	"capability_id" integer NOT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE "industry_capabilities" (
 );
 --> statement-breakpoint
 CREATE TABLE "learning" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"length" text NOT NULL,
 	"title" text NOT NULL,
 	"link" text NOT NULL,
@@ -138,7 +138,7 @@ CREATE TABLE "learning" (
 );
 --> statement-breakpoint
 CREATE TABLE "mail_events" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"kind" text NOT NULL,
 	"recipient" text NOT NULL,
 	"subject" text NOT NULL,
@@ -152,7 +152,7 @@ CREATE TABLE "mail_events" (
 );
 --> statement-breakpoint
 CREATE TABLE "orders" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"item" text NOT NULL,
 	"amount" real NOT NULL,
@@ -162,7 +162,7 @@ CREATE TABLE "orders" (
 );
 --> statement-breakpoint
 CREATE TABLE "password_reset_requests" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"token" text NOT NULL,
 	"expires_at" timestamp NOT NULL,
@@ -172,7 +172,7 @@ CREATE TABLE "password_reset_requests" (
 );
 --> statement-breakpoint
 CREATE TABLE "profile_demographics" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"employment_status" text,
 	"education_level" text,
@@ -185,7 +185,7 @@ CREATE TABLE "profile_demographics" (
 );
 --> statement-breakpoint
 CREATE TABLE "profiles" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"first_name" text NOT NULL,
 	"last_name" text NOT NULL,
 	"email" text NOT NULL,
@@ -210,7 +210,7 @@ CREATE TABLE "profiles" (
 );
 --> statement-breakpoint
 CREATE TABLE "questions" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"prompt" text NOT NULL,
 	"instruction" text NOT NULL,
 	"question_type_id" integer NOT NULL,
@@ -224,7 +224,7 @@ CREATE TABLE "questions" (
 );
 --> statement-breakpoint
 CREATE TABLE "rater_answers" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"rater_id" integer NOT NULL,
 	"question_id" integer NOT NULL,
 	"option_id" integer NOT NULL,
@@ -232,7 +232,7 @@ CREATE TABLE "rater_answers" (
 );
 --> statement-breakpoint
 CREATE TABLE "rater_campaigns" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"status" text DEFAULT 'draft' NOT NULL,
 	"reminder_days" integer DEFAULT 7 NOT NULL,
@@ -244,7 +244,7 @@ CREATE TABLE "rater_campaigns" (
 );
 --> statement-breakpoint
 CREATE TABLE "rater_email_templates" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"template_key" text NOT NULL,
 	"name" text NOT NULL,
 	"enabled" boolean DEFAULT true NOT NULL,
@@ -261,7 +261,7 @@ CREATE TABLE "rater_email_templates" (
 );
 --> statement-breakpoint
 CREATE TABLE "rater_emails" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"rater_id" integer NOT NULL,
 	"template_key" text NOT NULL,
@@ -280,7 +280,7 @@ CREATE TABLE "rater_emails" (
 );
 --> statement-breakpoint
 CREATE TABLE "raters" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
@@ -299,7 +299,7 @@ CREATE TABLE "raters" (
 );
 --> statement-breakpoint
 CREATE TABLE "referral_codes" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"code" text NOT NULL,
 	"owner_type" text NOT NULL,
 	"owner_name" text NOT NULL,
@@ -314,7 +314,7 @@ CREATE TABLE "referral_codes" (
 );
 --> statement-breakpoint
 CREATE TABLE "report_comments" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"category_id" integer NOT NULL,
 	"top" text NOT NULL,
 	"low" text NOT NULL,
@@ -323,7 +323,7 @@ CREATE TABLE "report_comments" (
 );
 --> statement-breakpoint
 CREATE TABLE "reputation_findings" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"scan_id" integer NOT NULL,
 	"title" text NOT NULL,
 	"url" text NOT NULL,
@@ -341,7 +341,7 @@ CREATE TABLE "reputation_findings" (
 );
 --> statement-breakpoint
 CREATE TABLE "reputation_scans" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"profile_id" integer NOT NULL,
 	"full_name" text NOT NULL,
 	"city" text,
@@ -359,7 +359,7 @@ CREATE TABLE "reputation_scans" (
 );
 --> statement-breakpoint
 CREATE TABLE "response_options" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"question_id" integer NOT NULL,
 	"label" text NOT NULL,
 	"score" real NOT NULL
