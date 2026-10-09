@@ -57,16 +57,26 @@ export const privilegedContracts = {
 type CdpReply = { id?: number; result?: unknown; error?: { message?: string } };
 
 async function renderWithChromium(html: string): Promise<string> {
-  // Check for Chromium in standard locations (Replit, Docker, system)
-  const chrome = [
-    process.env.CHROME_PATH,
-    "/opt/meta-chromium/chrome",
-    "/usr/bin/chromium",
-    "/usr/bin/chromium-browser",
-    "/usr/bin/google-chrome",
-    "/usr/bin/google-chrome-stable",
-    "/snap/bin/chromium",
-  ].filter(Boolean).find((p) => p && existsSync(p));
+  // Use Puppeteer's bundled Chromium if available, fallback to system paths
+  let chrome: string | undefined;
+  try {
+    const puppeteer = await import("puppeteer");
+    chrome = puppeteer.executablePath();
+    if (chrome && !existsSync(chrome)) chrome = undefined;
+  } catch {
+    // Puppeteer not available, try system paths
+  }
+  if (!chrome) {
+    chrome = [
+      process.env.CHROME_PATH,
+      "/opt/meta-chromium/chrome",
+      "/usr/bin/chromium",
+      "/usr/bin/chromium-browser",
+      "/usr/bin/google-chrome",
+      "/usr/bin/google-chrome-stable",
+      "/snap/bin/chromium",
+    ].filter(Boolean).find((p) => p && existsSync(p));
+  }
 
   if (!chrome) {
     throw new Error(

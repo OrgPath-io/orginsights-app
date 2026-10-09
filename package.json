@@ -6,6 +6,7 @@
     "drizzle-orm": "0.45.2",
     "express": "^4.21.2",
     "nodemailer": "^10.0.15",
+    "puppeteer": "^25.13.0",
     "react": "19.2.5",
     "react-dom": "19.2.5",
     "recharts": "2.15.3",
