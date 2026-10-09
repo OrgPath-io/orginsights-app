@@ -143,8 +143,60 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-app.listen(PORT, "0.0.0.0", () => {
+// Startup seed: ensure admin user and default referral codes exist.
+// This runs on every boot but only inserts missing rows (idempotent).
+async function seedDefaults() {
+  try {
+    const { getDb } = await import("./db.js");
+    const s = await import("../src/schema.js");
+    const { eq } = await import("drizzle-orm");
+    const db: any = getDb();
+
+    // 1. Admin user
+    const adminEmail = "akeel.mohamed@orgpath.io";
+    const existingAdmin = await db.select().from(s.profiles).where(eq(s.profiles.email, adminEmail)).limit(1);
+    if (!existingAdmin[0]) {
+      const now = new Date();
+      await db.insert(s.profiles).values({
+        firstName: "Akeel",
+        lastName: "Mohamed",
+        email: adminEmail,
+        country: "Canada",
+        plan: "coaching",
+        passwordHash: null,
+        passwordUpdatedAt: null,
+        coachDisclosure: false,
+        isAdmin: true,
+        createdAt: now,
+      });
+      console.log(`[seed] Created admin user ${adminEmail} (no password set; use Forgot Password to set one)`);
+    } else if (!existingAdmin[0].isAdmin) {
+      await db.update(s.profiles).set({ isAdmin: true }).where(eq(s.profiles.email, adminEmail));
+      console.log(`[seed] Promoted ${adminEmail} to admin`);
+    }
+
+    // 2. Default referral codes
+    const codes = [
+      { code: "COACHFREE", ownerType: "coach", ownerName: "OrgInsights Coach Program", ownerEmail: null, discountPercent: 100, isCoachCode: true, pricingMode: "free", fixedPrice: null, unlockTier: "360", active: true },
+      { code: "COACH25", ownerType: "coach", ownerName: "OrgInsights Coach Program", ownerEmail: null, discountPercent: 25, isCoachCode: true, pricingMode: "discount", fixedPrice: null, unlockTier: "360", active: true },
+      { code: "UPGRADE25", ownerType: "organization", ownerName: "OrgInsights", ownerEmail: null, discountPercent: 25, isCoachCode: false, pricingMode: "discount", fixedPrice: null, unlockTier: "full", active: true },
+      { code: "UPGRADE50", ownerType: "organization", ownerName: "OrgInsights", ownerEmail: null, discountPercent: 50, isCoachCode: false, pricingMode: "discount", fixedPrice: null, unlockTier: "full", active: true },
+    ];
+    for (const c of codes) {
+      const existing = await db.select().from(s.referralCodes).where(eq(s.referralCodes.code, c.code)).limit(1);
+      if (!existing[0]) {
+        await db.insert(s.referralCodes).values({ ...c, createdAt: new Date() });
+        console.log(`[seed] Created referral code ${c.code}`);
+      }
+    }
+  } catch (err) {
+    console.error("[seed] Startup seed failed (non-fatal):", err);
+  }
+}
+
+app.listen(PORT, "0.0.0.0", async () => {
   console.log(`OrgInsights server running on http://0.0.0.0:${PORT}`);
   console.log(`Actions endpoint: POST /api/actions`);
   console.log(`Database: ${process.env.DATABASE_PATH || "./data/app.db"}`);
+  await seedDefaults();
 });
