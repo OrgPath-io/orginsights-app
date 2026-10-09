@@ -148,7 +148,7 @@ process.on("SIGINT", () => {
 async function seedDefaults() {
   try {
     const { getDb } = await import("./db.js");
-    const s = await import("../src/schema.js");
+    const s = await import("../src/schema-pg.js");
     const { eq } = await import("drizzle-orm");
     const db: any = getDb();
 

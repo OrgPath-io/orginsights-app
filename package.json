@@ -7,6 +7,7 @@
     "drizzle-orm": "0.45.2",
     "express": "^4.21.2",
     "nodemailer": "^10.0.15",
+    "pg": "^8.23.1",
     "puppeteer": "^25.13.0",
     "puppeteer-core": "^25.13.0",
     "react": "19.2.5",
@@ -21,8 +22,10 @@
     "@types/better-sqlite3": "^7.6.12",
     "@types/express": "^4.17.21",
     "@types/node": "^26.6.4",
+    "@types/pg": "^8.23.1",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "drizzle-kit": "^0.31.11",
     "tailwindcss": "4.1.13",
     "tailwindcss-safe-area": "1.3.0",
     "typescript": "5.6.3",
@@ -36,8 +39,9 @@
     "build:client": "vite build --config client/vite.config.ts",
     "db:migrate": "tsx server/runtime/migrate.ts",
     "dev": "tsx --watch server/runtime/server.ts",
-    "start": "npm run db:migrate && tsx server/runtime/server.ts",
-    "typecheck": "tsc --noEmit -p client/tsconfig.json && tsc --noEmit -p server/tsconfig.json"
+    "start": "if [ -n \"$DATABASE_URL\" ]; then npm run db:migrate:pg; else npm run db:migrate; fi && tsx server/runtime/server.ts",
+    "typecheck": "tsc --noEmit -p client/tsconfig.json && tsc --noEmit -p server/tsconfig.json",
+    "db:migrate:pg": "tsx server/runtime/migrate-pg.ts"
   },
   "type": "module",
   "version": "1.0.0"

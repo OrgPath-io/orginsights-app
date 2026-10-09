@@ -1,6 +1,6 @@
 import { defineAction, z, type ActionsModule, type Ctx } from "../runtime/shim";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
-import * as s from "./schema";
+import * as s from "./schema-pg.js";
 import { privilegedContracts as privileged } from "../runtime/privileged-impl";
 
 const anyResponse = z.object({ data: z.any() });
@@ -742,7 +742,7 @@ export const Actions = {
   getWorkspace: defineAction({ request: z.object({}), response: anyResponse, privileged: [privileged.loadLegacySmtpConfiguration], async handler(ctx) {
     const db = ctx.db<typeof s>();
     await ensureRaterTemplates(ctx);
-    const expiredCampaigns = await db.select().from(s.raterCampaigns).where(and(eq(s.raterCampaigns.status, "open"), sql`${s.raterCampaigns.endAt} <= ${now().getTime()}`));
+    const expiredCampaigns = await db.select().from(s.raterCampaigns).where(and(eq(s.raterCampaigns.status, "open"), sql`${s.raterCampaigns.endAt} <= ${now()}`));
     for (const campaign of expiredCampaigns) {
       const completed = await db.select({ count: sql<number>`count(*)` }).from(s.raters).where(and(eq(s.raters.profileId, campaign.profileId), eq(s.raters.status, "completed")));
       await db.update(s.raterCampaigns).set({ status: "closed", closedAt: now() }).where(eq(s.raterCampaigns.id, campaign.id));
