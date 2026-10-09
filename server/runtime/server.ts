@@ -28,8 +28,72 @@ const PORT = Number(process.env.PORT || 5000);
 // JSON body parsing (actions can include base64 images, allow large payloads)
 app.use(express.json({ limit: "25mb" }));
 
+// Cookie parsing (for session management)
+function parseCookies(cookieHeader?: string): Record<string, string> {
+  const cookies: Record<string, string> = {};
+  if (!cookieHeader) return cookies;
+  for (const part of cookieHeader.split(";")) {
+    const [key, ...rest] = part.trim().split("=");
+    if (key) cookies[key.trim()] = decodeURIComponent(rest.join("="));
+  }
+  return cookies;
+}
+
+// Session management
+const SESSION_COOKIE = "oi_session";
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+async function createSession(profileId: number): Promise<string> {
+  const { getDb } = await import("./db.js");
+  const s = await import("../src/schema-pg.js");
+  const db: any = getDb();
+  const sessionId = randomUUID();
+  const now = new Date();
+  await db.insert(s.sessions).values({
+    id: sessionId,
+    profileId,
+    createdAt: now,
+    expiresAt: new Date(now.getTime() + SESSION_TTL_MS),
+  });
+  return sessionId;
+}
+
+async function getSessionProfileId(sessionId?: string): Promise<number | undefined> {
+  if (!sessionId) return undefined;
+  try {
+    const { getDb } = await import("./db.js");
+    const s = await import("../src/schema-pg.js");
+    const { eq } = await import("drizzle-orm");
+    const db: any = getDb();
+    const rows = await db.select().from(s.sessions).where(eq(s.sessions.id, sessionId)).limit(1);
+    const session = rows[0];
+    if (!session) return undefined;
+    if (new Date(session.expiresAt).getTime() <= Date.now()) {
+      // Expired, clean up
+      await db.delete(s.sessions).where(eq(s.sessions.id, sessionId));
+      return undefined;
+    }
+    return session.profileId;
+  } catch {
+    return undefined;
+  }
+}
+
+async function destroySession(sessionId?: string): Promise<void> {
+  if (!sessionId) return;
+  try {
+    const { getDb } = await import("./db.js");
+    const s = await import("../src/schema-pg.js");
+    const { eq } = await import("drizzle-orm");
+    const db: any = getDb();
+    await db.delete(s.sessions).where(eq(s.sessions.id, sessionId));
+  } catch {
+    // Ignore cleanup errors
+  }
+}
+
 // Build the per-request context
-function createCtx(): Ctx {
+function createCtx(sessionProfileId?: number, setSessionCookie?: (sessionId: string) => void, clearSessionCookie?: () => void): Ctx {
   return {
     slug: "orginsights-app",
     invocationId: randomUUID(),
@@ -41,6 +105,14 @@ function createCtx(): Ctx {
       // No-op server-side. In the sandbox this invalidated the React Query
       // cache; the standalone client refetches explicitly after mutations.
     },
+    sessionProfileId,
+    setSession: setSessionCookie
+      ? async (profileId: number) => {
+          const sessionId = await createSession(profileId);
+          setSessionCookie(sessionId);
+        }
+      : undefined,
+    clearSession: clearSessionCookie,
   };
 }
 
@@ -64,8 +136,23 @@ app.post("/api/actions", async (req, res) => {
     // Validate request args with zod
     const parsedArgs = action.request.parse(args ?? {});
 
-    // Call the handler with our standalone ctx
-    const ctx = createCtx();
+    // Session handling: parse session cookie, resolve to profile ID
+    const cookies = parseCookies(req.headers.cookie);
+    const sessionId = cookies[SESSION_COOKIE];
+    const sessionProfileId = await getSessionProfileId(sessionId);
+
+    // Cookie setters for login/logout actions
+    const setSessionCookie = (newSessionId: string) => {
+      const isSecure = req.headers["x-forwarded-proto"] === "https" || process.env.NODE_ENV === "production";
+      res.setHeader("Set-Cookie", `${SESSION_COOKIE}=${newSessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_TTL_MS / 1000}${isSecure ? "; Secure" : ""}`);
+    };
+    const clearSessionCookie = () => {
+      res.setHeader("Set-Cookie", `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`);
+      if (sessionId) destroySession(sessionId);
+    };
+
+    // Call the handler with our standalone ctx (including session)
+    const ctx = createCtx(sessionProfileId, setSessionCookie, clearSessionCookie);
     const result = await action.handler(ctx, parsedArgs);
 
     // Validate response with zod (catches handler bugs in dev)

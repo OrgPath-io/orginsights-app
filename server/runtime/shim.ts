@@ -55,6 +55,12 @@ export interface Ctx extends PrivilegedExecutor {
   readonly db: SpaceDbAccessor;
   readonly blobs: BlobClient;
   invalidateQueries(): void;
+  /** Profile ID from the authenticated session (server-verified, not client-supplied) */
+  readonly sessionProfileId?: number;
+  /** Set a session cookie on the response (for login/profile creation) */
+  readonly setSession?: (profileId: number) => Promise<void>;
+  /** Clear the session cookie (for logout) */
+  readonly clearSession?: () => void;
 }
 
 // Action definition (matches SDK's branded shape)

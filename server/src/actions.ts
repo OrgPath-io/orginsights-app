@@ -55,11 +55,18 @@ function safeProfile(profile: typeof s.profiles.$inferSelect) {
   return { ...publicFields, hasPassword: Boolean(_passwordHash) };
 }
 
-// Admin authorization helper. All admin-only actions must call this first
-// with the caller's profile id. Returns true if the caller is an admin.
+// Admin authorization helper. All admin-only actions must call this first.
+// SECURITY: Uses the server-verified session profile ID, NOT the client-supplied
+// callerProfileId. The callerProfileId parameter is kept for backward compatibility
+// but is validated against the session.
 async function requireAdmin(ctx: Ctx, callerProfileId: number): Promise<boolean> {
+  const sessionProfileId = ctx.sessionProfileId;
+  // Must have a valid session
+  if (!sessionProfileId) return false;
+  // Session profile must match the claimed caller (prevents impersonation)
+  if (sessionProfileId !== callerProfileId) return false;
   const db = ctx.db<typeof s>();
-  const rows = await db.select({ isAdmin: s.profiles.isAdmin }).from(s.profiles).where(eq(s.profiles.id, callerProfileId)).limit(1);
+  const rows = await db.select({ isAdmin: s.profiles.isAdmin }).from(s.profiles).where(eq(s.profiles.id, sessionProfileId)).limit(1);
   return rows[0]?.isAdmin === true;
 }
 
@@ -752,7 +759,11 @@ export const Actions = {
     await reconcileCandidateEmails(ctx);
     const smtp = await ensureSmtpConfiguration(ctx);
     const allProfiles = await db.select().from(s.profiles).orderBy(desc(s.profiles.createdAt));
-    const profile = allProfiles[0] ?? null;
+    // Use session profile if available, otherwise fall back to latest (for backward compat)
+    const sessionProfileId = ctx.sessionProfileId;
+    const profile = sessionProfileId
+      ? allProfiles.find(p => p.id === sessionProfileId) ?? null
+      : allProfiles[0] ?? null;
     const [countries, capabilities, categories, questions, options, codes, accessCodes, orders, mail, audit, settings, allAssessments, allRaters, emailTemplates, candidateEmails, raterCampaigns, raterEmailTemplates, raterEmails] = await Promise.all([
       db.select().from(s.countries).orderBy(asc(s.countries.name)), db.select().from(s.capabilities).orderBy(asc(s.capabilities.id)), db.select().from(s.categories).orderBy(asc(s.categories.id)), db.select().from(s.questions).orderBy(asc(s.questions.id)), db.select().from(s.responseOptions).orderBy(asc(s.responseOptions.id)), db.select().from(s.referralCodes).orderBy(desc(s.referralCodes.id)), db.select().from(s.accessCodes).orderBy(desc(s.accessCodes.id)).limit(200), db.select().from(s.orders).orderBy(desc(s.orders.id)), db.select().from(s.mailEvents).orderBy(desc(s.mailEvents.id)).limit(50), db.select().from(s.auditLog).orderBy(desc(s.auditLog.id)).limit(50), db.select().from(s.settings), db.select().from(s.assessments).orderBy(desc(s.assessments.id)), db.select().from(s.raters).orderBy(desc(s.raters.id)), db.select().from(s.emailTemplates).orderBy(asc(s.emailTemplates.id)), db.select().from(s.candidateEmails).orderBy(desc(s.candidateEmails.scheduledAt)), db.select().from(s.raterCampaigns).orderBy(desc(s.raterCampaigns.id)), db.select().from(s.raterEmailTemplates).orderBy(asc(s.raterEmailTemplates.id)), db.select().from(s.raterEmails).orderBy(desc(s.raterEmails.scheduledAt)),
     ]);
@@ -884,6 +895,8 @@ export const Actions = {
     await addAudit(ctx, "Registered candidate", "profile", a.email);
     await reconcileCandidateEmails(ctx);
     ctx.invalidateQueries();
+    // Create authenticated session for the new profile
+    if (ctx.setSession) await ctx.setSession(profile.id);
     return { ok: true, message: accessCode ? "Access code accepted. Your $99 Full Assessment tier is unlocked." : freeCoachAccess ? `Coach code accepted. Your ${coachTier === "360" ? "$149 360 Assessment" : "$99 Full Assessment"} tier is unlocked with no checkout.` : coachCode ? "Coach code accepted. Complete the one-time checkout for your assigned tier." : "Profile created." };
   }}),
   setAssessmentMode: defineAction({ request:z.object({profileId:z.number().int(),mode:z.enum(["snapshot","summary","360"])}),response:okResponse,async handler(ctx,a){const db=ctx.db<typeof s>();const rows=await db.select().from(s.profiles).where(eq(s.profiles.id,a.profileId)).limit(1);const profile=rows[0];if(!profile)return{ok:false,message:"Profile not found."};if(a.mode==="snapshot"&&profile.referralCode){const codes=await db.select().from(s.referralCodes).where(eq(s.referralCodes.code,profile.referralCode.toUpperCase())).limit(1);if(codes[0]?.isCoachCode)return{ok:false,message:"Coach pathways include the full assessment. Choose OrgInsights assessment or 360 assessment."};}await db.update(s.profiles).set({assessmentMode:a.mode}).where(eq(s.profiles.id,a.profileId));if(a.mode==="360")await db.insert(s.raterCampaigns).values({profileId:a.profileId,status:"draft",reminderDays:7,createdAt:now()}).onConflictDoNothing();await addAudit(ctx,"Selected assessment path","profile",a.mode);ctx.invalidateQueries();return{ok:true,message:a.mode==="snapshot"?"Snapshot assessment selected.":a.mode==="360"?"360 assessment selected. Complete both candidate sections, then invite 3 to 10 raters.":"OrgInsights assessment selected."};}}),

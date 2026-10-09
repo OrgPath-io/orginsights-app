@@ -140,3 +140,10 @@ export const reputationFindings = sqliteTable("reputation_findings", {
   userMatch: text("user_match", { enum: ["auto", "confirmed", "excluded"] }).notNull().default("auto"),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
 }, (table) => [index("reputation_findings_scan_id_idx").on(table.scanId)]);
+
+export const sessions = sqliteTable("sessions", {
+  id: text("id").primaryKey(),
+  profileId: integer("profile_id").notNull().references(() => profiles.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
+  expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+}, (table) => [index("sessions_profile_id_idx").on(table.profileId)]);

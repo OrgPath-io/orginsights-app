@@ -140,3 +140,10 @@ export const reputationFindings = pgTable("reputation_findings", {
   userMatch: text("user_match").notNull().default("auto"),
   createdAt: timestamp("created_at").notNull().$defaultFn(() => new Date()),
 }, (table) => [index("reputation_findings_scan_id_idx").on(table.scanId)]);
+
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  profileId: integer("profile_id").notNull().references(() => profiles.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").notNull().$defaultFn(() => new Date()),
+  expiresAt: timestamp("expires_at").notNull(),
+}, (table) => [index("sessions_profile_id_idx").on(table.profileId)]);
