@@ -1,6 +1,8 @@
 # Dependencies
 node_modules/
 bun.lockb
+bun.lock
+.bun-cache/
 
 # Runtime data
 data/
@@ -24,6 +26,7 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+.tsbuildinfo
 
 # Replit
 .replit.nix

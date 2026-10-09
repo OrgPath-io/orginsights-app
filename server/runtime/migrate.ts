@@ -5,15 +5,16 @@
  * in filename order. Tracks applied migrations in a _migrations table
  * so re-runs are safe (idempotent).
  *
- * Run: bun run db:migrate
+ * Run: npm run db:migrate
  */
 
-import { Database } from "bun:sqlite";
+import Database from "better-sqlite3";
 import { readdirSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const dbPath = process.env.DATABASE_PATH || "./data/app.db";
-const migrationsDir = join(dirname(import.meta.path), "..", "..", "drizzle");
+const migrationsDir = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "drizzle");
 
 // Ensure data directory exists
 const dir = dirname(dbPath);
@@ -21,9 +22,9 @@ if (!existsSync(dir)) {
   mkdirSync(dir, { recursive: true });
 }
 
-const db = new Database(dbPath, { create: true });
-db.exec("PRAGMA journal_mode = WAL;");
-db.exec("PRAGMA foreign_keys = ON;");
+const db = new Database(dbPath);
+db.pragma("journal_mode = WAL");
+db.pragma("foreign_keys = ON");
 
 // Migration tracking table
 db.exec(`
@@ -35,7 +36,7 @@ db.exec(`
 `);
 
 const applied = new Set(
-  (db.query("SELECT name FROM _migrations").all() as { name: string }[]).map((r) => r.name)
+  (db.prepare("SELECT name FROM _migrations").all() as { name: string }[]).map((r) => r.name)
 );
 
 // Get migration files in order

@@ -1,1 +1,41 @@
-{"dependencies":{"@tanstack/react-query":"5.100.10","@types/nodemailer":"^8.0.2","drizzle-orm":"0.45.2","express":"^4.21.2","nodemailer":"^10.0.15","react":"19.2.5","react-dom":"19.2.5","recharts":"2.15.3","zod":"4.4.3"},"description":"OrgInsights assessment platform - standalone deployment","devDependencies":{"@types/bun":"1.4.2","@types/express":"^4.17.21","@types/react":"19.2.14","@types/react-dom":"19.2.3","bun-plugin-tailwind":"0.0.15","tailwindcss":"4.1.13","tailwindcss-safe-area":"1.3.0","typescript":"5.6.3"},"name":"orginsights-app","private":true,"scripts":{"build":"bun run build:client","build:client":"bun ./client/build.mjs","db:migrate":"bun server/runtime/migrate.ts","dev":"bun --watch server/runtime/server.ts","start":"bun run db:migrate && bun server/runtime/server.ts","typecheck":"bun x tsc --noEmit -p client/tsconfig.json && bun x tsc --noEmit -p server/tsconfig.json"},"type":"module","version":"1.0.0"}
+{
+  "dependencies": {
+    "@tanstack/react-query": "5.100.10",
+    "@types/nodemailer": "^8.0.2",
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "0.45.2",
+    "express": "^4.21.2",
+    "nodemailer": "^10.0.15",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "recharts": "2.15.3",
+    "tsx": "^4.20.6",
+    "zod": "4.4.3"
+  },
+  "description": "OrgInsights assessment platform - standalone deployment",
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/express": "^4.17.21",
+    "@types/node": "^26.6.4",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "tailwindcss": "4.1.13",
+    "tailwindcss-safe-area": "1.3.0",
+    "typescript": "5.6.3",
+    "vite": "^6.3.5"
+  },
+  "name": "orginsights-app",
+  "packageManager": "npm@10.9.4",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:client",
+    "build:client": "vite build --config client/vite.config.ts",
+    "db:migrate": "tsx server/runtime/migrate.ts",
+    "dev": "tsx --watch server/runtime/server.ts",
+    "start": "npm run db:migrate && tsx server/runtime/server.ts",
+    "typecheck": "tsc --noEmit -p client/tsconfig.json && tsc --noEmit -p server/tsconfig.json"
+  },
+  "type": "module",
+  "version": "1.0.0"
+}

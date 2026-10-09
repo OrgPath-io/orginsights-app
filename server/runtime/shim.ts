@@ -12,13 +12,17 @@
  */
 
 import { z } from "zod";
-import type { BunSQLiteDatabase } from "drizzle-orm/bun-sqlite";
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
 export { z };
 
-// Database type matches what the app expects from ctx.db()
+// Database type matches what the app expects from ctx.db().
+// (better-sqlite3 has no .batch(), so the runtime db.ts provides one;
+// it is typed here so action code keeps working unchanged.)
 export type SpaceDb<TSchema extends Record<string, unknown> = Record<string, never>> =
-  Pick<BunSQLiteDatabase<TSchema>, "select" | "insert" | "update" | "delete" | "run" | "all" | "get" | "batch">;
+  Pick<BetterSQLite3Database<TSchema>, "select" | "insert" | "update" | "delete"> & {
+    batch: (queries: Array<PromiseLike<unknown>>) => Promise<unknown[]>;
+  };
 
 export type SpaceDbAccessor = <TSchema extends Record<string, unknown> = Record<string, never>>() => SpaceDb<TSchema>;
 

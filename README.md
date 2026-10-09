@@ -7,10 +7,10 @@ outside the Hatch sandbox on any Node/Bun-compatible host (Replit, VPS, etc.).
 
 ```bash
 # Install dependencies
-bun install
+npm install
 
 # Start (runs migrations, then the server)
-bun run start
+npm run start
 ```
 
 The app will be available at `http://localhost:5000`.
@@ -19,11 +19,11 @@ The app will be available at `http://localhost:5000`.
 
 | Command | Description |
 |---------|-------------|
-| `bun run start` | Run migrations + start server (production) |
-| `bun run dev` | Start server with hot reload (development) |
-| `bun run build` | Build the React client |
-| `bun run db:migrate` | Apply database migrations only |
-| `bun run typecheck` | Type-check client and server |
+| `npm run start` | Run migrations + start server (production) |
+| `npm run dev` | Start server with hot reload (development) |
+| `npm run build` | Build the React client |
+| `npm run db:migrate` | Apply database migrations only |
+| `npm run typecheck` | Type-check client and server |
 
 ## Environment Variables
 
@@ -94,13 +94,13 @@ version replaces the sandbox with:
 
 One bug fix during migration: a raw SQL query passed a `Date` object
 directly as a binding parameter (line 734). Changed to `.getTime()` for
-bun:sqlite compatibility. This was a latent bug that the original
+better-sqlite3 compatibility. This was a latent bug that the original
 runtime happened to tolerate.
 
 ## Replit Deployment
 
 1. Create a new Replit project, import from GitHub (or upload this folder)
-2. Set the Run command to `bun run start`
+2. Set the Run command to `npm run start`
 3. Add secrets for `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`
 4. For PDF generation, add Chromium: Replit's Nix environment can install it,
    or set `CHROME_PATH` to a pre-installed binary

@@ -6,7 +6,7 @@
  * - GET  /blobs/*       -> serves uploaded files (question images)
  * - GET  /*             -> serves the React SPA
  *
- * Run: bun run start
+ * Run: npm start
  * Env: PORT (default 5000), DATABASE_PATH, BLOB_DIR, SMTP_* vars
  */
 
@@ -127,7 +127,7 @@ if (existsSync(clientDist)) {
 } else {
   app.get("/", (_req, res) => {
     res.status(503).send(
-      "Client not built. Run <code>bun run build:client</code> first."
+      "Client not built. Run <code>npm run build:client</code> first."
     );
   });
 }

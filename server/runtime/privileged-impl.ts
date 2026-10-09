@@ -9,6 +9,7 @@
 
 import { existsSync } from "node:fs";
 import { readFile, rm } from "node:fs/promises";
+import { spawn, type ChildProcess } from "node:child_process";
 import nodemailer from "nodemailer";
 import { renderOriginalReportHtml, type TemplateInput } from "../src/report-template";
 import type { PrivilegedContract } from "./shim";
@@ -76,12 +77,16 @@ async function renderWithChromium(html: string): Promise<string> {
   }
 
   const profileDir = `/tmp/orginsights-pdf-${crypto.randomUUID()}`;
-  const proc = Bun.spawn([
-    chrome, "--headless=new", "--no-sandbox", "--disable-gpu",
-    "--disable-dev-shm-usage", "--disable-background-networking",
-    "--no-first-run", "--remote-debugging-port=0",
-    `--user-data-dir=${profileDir}`, "about:blank"
-  ], { stdin: "ignore", stdout: "ignore", stderr: "ignore" });
+  const proc: ChildProcess = spawn(
+    chrome,
+    ["--headless=new", "--no-sandbox", "--disable-gpu",
+      "--disable-dev-shm-usage", "--disable-background-networking",
+      "--no-first-run", "--remote-debugging-port=0",
+      `--user-data-dir=${profileDir}`, "about:blank"],
+    { stdio: "ignore" }
+  );
+
+  const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
   let socket: WebSocket | null = null;
   try {
@@ -93,7 +98,7 @@ async function renderWithChromium(html: string): Promise<string> {
       } catch {
         // Chromium needs a short startup window before DevTools is ready.
       }
-      await Bun.sleep(100);
+      await sleep(100);
     }
     if (!socketUrl) throw new Error("Headless Chromium started but its print interface was unavailable.");
 
@@ -142,8 +147,23 @@ async function renderWithChromium(html: string): Promise<string> {
     return result.data;
   } finally {
     socket?.close();
-    proc.kill();
-    await proc.exited.catch(() => undefined);
+    try {
+      proc.kill();
+    } catch {
+      // Process may have already exited.
+    }
+    // Wait for the Chromium process to exit (with a timeout so we never hang).
+    await new Promise<void>((resolve) => {
+      if (proc.exitCode !== null || proc.signalCode !== null) {
+        resolve();
+        return;
+      }
+      const timer = setTimeout(resolve, 5000);
+      proc.once("exit", () => {
+        clearTimeout(timer);
+        resolve();
+      });
+    });
     await rm(profileDir, { recursive: true, force: true }).catch(() => undefined);
   }
 }

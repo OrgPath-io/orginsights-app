@@ -2,7 +2,7 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2022"],
-    "types": ["bun-types"],
+    "types": ["node"],
     "outDir": "./dist",
     "rootDir": ".",
     "tsBuildInfoFile": "./.tsbuildinfo.server",
@@ -10,5 +10,5 @@
       "@space/privileged": ["./.generated/privileged.contract"]
     }
   },
-  "include": ["src/**/*", ".generated/**/*"]
+  "include": ["src/**/*", "runtime/**/*", ".generated/**/*"]
 }
