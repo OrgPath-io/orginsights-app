@@ -423,6 +423,18 @@ async function reconcileCandidateEmails(ctx: Ctx) {
     if (ownCampaign?.status === "closed" && ownCampaign.closedAt) {
       const readyTemplate = templateMap.get("report_360_ready");
       if (readyTemplate) await scheduleCandidateEmail(ctx, profile, readyTemplate, ownCampaign.closedAt, null, false, {}, null, `campaign-${ownCampaign.id}`);
+      // Notify coach when 360 completes (if coach-sourced)
+      if (profile.coachDisclosure && profile.referralCode) {
+        const referral = referralCodes.find((row) => row.code === profile.referralCode && row.isCoachCode);
+        const coachTemplate = templateMap.get("coach_candidate_completed");
+        if (referral?.ownerEmail && coachTemplate) {
+          let coachResultToken = profile.coachResultToken;
+          if (!coachResultToken) { coachResultToken = makeRaterToken(); await db.update(s.profiles).set({ coachResultToken }).where(eq(s.profiles.id, profile.id)); }
+          const joiner = baseUrl.includes("?") ? "&" : "?";
+          const coachUrl = `${baseUrl}${joiner}coachResults=${encodeURIComponent(coachResultToken)}`;
+          await scheduleCandidateEmail(ctx, profile, coachTemplate, ownCampaign.closedAt, null, false, { coach_name: referral.ownerName, candidate_name: `${profile.firstName} ${profile.lastName}`.trim(), tier_name: planLabel(profile.plan) + " (360 complete)", coach_results_url: coachUrl }, referral.ownerEmail, `assessment-360-${ownCampaign.id}`);
+        }
+      }
     }
     if (ownCampaign?.status === "open" && ownCampaign.launchedAt && completedCount < 3) {
       for (const [key, days] of [["stalled_360_1", 7], ["stalled_360_2", 14]] as const) {
