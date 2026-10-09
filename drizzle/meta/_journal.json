@@ -141,6 +141,13 @@
       "when": 1791483986998,
       "tag": "0020_fix_calendar_embed_url",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1791509000000,
+      "tag": "0021_add_is_admin_to_profiles",
+      "breakpoints": true
     }
   ]
 }
