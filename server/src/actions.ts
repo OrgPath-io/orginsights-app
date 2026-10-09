@@ -271,7 +271,7 @@ async function reconcileRaterEmails(ctx: Ctx) {
       }
     }
   }
-  await db.update(s.raterEmails).set({ status: "queued", queuedAt: now() }).where(and(eq(s.raterEmails.status, "scheduled"), sql`${s.raterEmails.scheduledAt} <= ${Date.now()}`));
+  await db.update(s.raterEmails).set({ status: "queued", queuedAt: now() }).where(and(eq(s.raterEmails.status, "scheduled"), sql`${s.raterEmails.scheduledAt} <= ${now()}`));
 }
 
 function addMs(date: Date, amount: number) { return new Date(date.getTime() + amount); }
@@ -425,7 +425,7 @@ async function reconcileCandidateEmails(ctx: Ctx) {
       await scheduleCandidateEmail(ctx, profile, receiptTemplate, order.createdAt, null, false, fields, null, `order-${order.id}`);
     }
   }
-  await db.update(s.candidateEmails).set({ status: "queued", queuedAt: now() }).where(and(eq(s.candidateEmails.status, "scheduled"), sql`${s.candidateEmails.scheduledAt} <= ${Date.now()}`));
+  await db.update(s.candidateEmails).set({ status: "queued", queuedAt: now() }).where(and(eq(s.candidateEmails.status, "scheduled"), sql`${s.candidateEmails.scheduledAt} <= ${now()}`));
 }
 
 function shuffle<T>(items: readonly T[]): T[] {
