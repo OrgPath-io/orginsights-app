@@ -73,7 +73,7 @@ export function App(){
  if(ws.isPending)return <div className="center"><div className="spinner"/><p>Preparing your workspace…</p></div>;
  if(ws.error)return <div className="center"><h1>We couldn’t load the workspace.</h1><button className="primary" onClick={()=>ws.refetch()}>Try again</button></div>;
  if(forceRegistration||!profile)return <Register countries={data.countries??[]} settings={data.settings??[]} busy={create.isPending} result={create.data??null} onSubmit={(x)=>create.mutate(x)} onLogin={()=>ws.refetch()}/>;
- const go=(v:View)=>{setView(v);window.scrollTo(0,0)};
+ const go=(v:View)=>{setView((_)=>v);window.scrollTo(0,0)};
  const selectTier=(tier:"free"|"free-summary"|"full"|"360"|"coaching")=>{if(tier==="free"||tier==="free-summary"){chooseMode.mutate({profileId:profile.id,mode:tier==="free"?"snapshot":"summary"});return}setCheckoutItem(tier);go("pricing")};
  return <div className="app"><SafeAreaTopScrim backgroundColor="var(--forest)"/>
   <aside className="rail"><img src={logo} alt="OrgInsights"/><nav>{visibleNav.map(n=><button key={n.id} className={view===n.id?"active":""} onClick={()=>go(n.id)}><Icon name={n.icon}/><span>{n.label}</span></button>)}</nav><a className="support-btn" href="mailto:support@orginsights.io" aria-label="Contact support" title="Contact support"><Icon name="mail"/></a><button className="avatar" onClick={()=>go("profile")} aria-label="Open profile">{profile.firstName[0]}{profile.lastName[0]}</button></aside>
