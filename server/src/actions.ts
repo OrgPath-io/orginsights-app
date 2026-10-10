@@ -240,6 +240,59 @@ async function ensureSmtpConfiguration(ctx: Ctx) {
   }
   return { configured: storedConfigured, host: values.get("smtp_host") ?? "", user: values.get("smtp_user") ?? "", password: values.get("smtp_password") ?? "", port: 587, fromEmail: values.get("smtp_from_email") ?? "info@orginsights.io", fromName: values.get("smtp_from_name") ?? "OrgInsights" };
 }
+async function processEmailQueue(ctx: Ctx) {
+  const db = ctx.db<typeof s>();
+  const smtp = await ensureSmtpConfiguration(ctx);
+  if (!smtp.configured) return { sent: 0, failed: 0 };
+  let sent = 0, failed = 0;
+  const [candidateQueue, raterQueue, profiles, raters] = await Promise.all([
+    db.select().from(s.candidateEmails).where(eq(s.candidateEmails.status, "queued")).orderBy(asc(s.candidateEmails.scheduledAt)).limit(100),
+    db.select().from(s.raterEmails).where(eq(s.raterEmails.status, "queued")).orderBy(asc(s.raterEmails.scheduledAt)).limit(100),
+    db.select().from(s.profiles),
+    db.select().from(s.raters)
+  ]);
+  const profileMap = new Map(profiles.map(row => [row.id, row]));
+  const raterMap = new Map(raters.map(row => [row.id, row]));
+  const unsubscribe = "mailto:info@orginsights.io?subject=Unsubscribe";
+  for (const item of candidateQueue) {
+    const profile = profileMap.get(item.profileId);
+    if (!profile) continue;
+    const html = item.htmlSnapshot.replaceAll("{{unsubscribe_url}}", unsubscribe).replaceAll("{{report_url}}", "https://app.orginsights.io/").replaceAll("{{button_url}}", "https://app.orginsights.io/");
+    const recipient = item.recipientEmail ?? profile.email;
+    const result = await ctx.executePrivileged(privileged.sendSmtpMail, { ...smtp, to: recipient, subject: item.subjectSnapshot, html });
+    if (result.ok) {
+      const stamp = now();
+      await db.update(s.candidateEmails).set({ status: "sent", attemptedAt: stamp, sentAt: stamp, failureReason: null }).where(eq(s.candidateEmails.id, item.id));
+      await recordMailAttempt(ctx, { kind: "candidate_delivery", recipient, subject: item.subjectSnapshot, status: "sent", relatedId: profile.id, usedPort: result.usedPort, messageId: result.messageId });
+      sent += 1;
+    } else {
+      const reason = result.error ?? "SMTP delivery failed.";
+      await db.update(s.candidateEmails).set({ status: "failed", attemptedAt: now(), failureReason: reason }).where(eq(s.candidateEmails.id, item.id));
+      await recordMailAttempt(ctx, { kind: "candidate_delivery", recipient, subject: item.subjectSnapshot, status: "failed", relatedId: profile.id, failureReason: reason, usedPort: result.usedPort });
+      failed += 1;
+    }
+  }
+  for (const item of raterQueue) {
+    const rater = raterMap.get(item.raterId);
+    if (!rater) continue;
+    const html = item.htmlSnapshot.replaceAll("{{unsubscribe_url}}", unsubscribe);
+    const result = await ctx.executePrivileged(privileged.sendSmtpMail, { ...smtp, to: rater.email, subject: item.subjectSnapshot, html });
+    if (result.ok) {
+      const stamp = now();
+      await db.update(s.raterEmails).set({ status: "sent", attemptedAt: stamp, sentAt: stamp, failureReason: null }).where(eq(s.raterEmails.id, item.id));
+      if (item.sequenceNumber !== 999) await db.update(s.raters).set(item.sequenceNumber === 0 ? { inviteSentAt: stamp, nextReminderAt: addMs(stamp, (rater.reminderDays ?? 7) * 86400000) } : { lastRemindedAt: stamp, reminderCount: item.sequenceNumber, nextReminderAt: addMs(stamp, (rater.reminderDays ?? 7) * 86400000) }).where(eq(s.raters.id, rater.id));
+      await recordMailAttempt(ctx, { kind: "rater_delivery", recipient: rater.email, subject: item.subjectSnapshot, status: "sent", relatedId: item.profileId, usedPort: result.usedPort, messageId: result.messageId });
+      sent += 1;
+    } else {
+      const reason = result.error ?? "SMTP delivery failed.";
+      await db.update(s.raterEmails).set({ status: "failed", attemptedAt: now(), failureReason: reason }).where(eq(s.raterEmails.id, item.id));
+      await recordMailAttempt(ctx, { kind: "rater_delivery", recipient: rater.email, subject: item.subjectSnapshot, status: "failed", relatedId: item.profileId, failureReason: reason, usedPort: result.usedPort });
+      failed += 1;
+    }
+  }
+  return { sent, failed };
+}
+
 async function reconcileRaterEmails(ctx: Ctx) {
   const db = ctx.db<typeof s>();
   await ensureRaterTemplates(ctx);
@@ -357,6 +410,7 @@ async function deliverCandidateEmailNow(ctx: Ctx, profile: typeof s.profiles.$in
 async function cancelUpgradeEmails(ctx: Ctx, profileId: number) {
   const db = ctx.db<typeof s>();
   await db.update(s.candidateEmails).set({ status: "cancelled", cancelledAt: now() }).where(and(eq(s.candidateEmails.profileId, profileId), inArray(s.candidateEmails.status, ["scheduled", "queued", "failed"]), inArray(s.candidateEmails.templateKey, [...UPGRADE_EMAIL_KEYS])));
+  await processEmailQueue(ctx);
 }
 
 async function reconcileCandidateEmails(ctx: Ctx) {
@@ -468,6 +522,7 @@ async function reconcileCandidateEmails(ctx: Ctx) {
     }
   }
   await db.update(s.candidateEmails).set({ status: "queued", queuedAt: now() }).where(and(eq(s.candidateEmails.status, "scheduled"), sql`${s.candidateEmails.scheduledAt} <= ${now()}`));
+  await processEmailQueue(ctx);
 }
 
 function shuffle<T>(items: readonly T[]): T[] {
@@ -1396,49 +1451,7 @@ export const Actions = {
   runEmailEngine: defineAction({ request: z.object({callerProfileId:z.number().int(),}), response: z.object({ ok: z.boolean(), queued: z.number().int(), scheduled: z.number().int(), sent: z.number().int(), failed: z.number().int() }), privileged:[privileged.loadLegacySmtpConfiguration,privileged.sendSmtpMail], async handler(ctx, a): Promise<{ ok: boolean; queued: number; scheduled: number; sent:number;failed:number }> {if(!(await requireAdmin(ctx,a.callerProfileId)))return{ok:false,queued:0,scheduled:0,sent:0,failed:0};
     await reconcileRaterEmails(ctx);
     await reconcileCandidateEmails(ctx);
-    const db = ctx.db<typeof s>();const smtp=await ensureSmtpConfiguration(ctx);let sent=0,failed=0;
-    if(smtp.configured){
-      const [candidateQueue,raterQueue,profiles,raters]=await Promise.all([db.select().from(s.candidateEmails).where(eq(s.candidateEmails.status,"queued")).orderBy(asc(s.candidateEmails.scheduledAt)).limit(100),db.select().from(s.raterEmails).where(eq(s.raterEmails.status,"queued")).orderBy(asc(s.raterEmails.scheduledAt)).limit(100),db.select().from(s.profiles),db.select().from(s.raters)]);const profileMap=new Map(profiles.map(row=>[row.id,row]));const raterMap=new Map(raters.map(row=>[row.id,row]));const unsubscribe="mailto:info@orginsights.io?subject=Unsubscribe";
-      for (const item of candidateQueue) {
-        const profile = profileMap.get(item.profileId);
-        if (!profile) continue;
-        const html = item.htmlSnapshot.replaceAll("{{unsubscribe_url}}", unsubscribe).replaceAll("{{report_url}}", "https://app.orginsights.io/").replaceAll("{{button_url}}", "https://app.orginsights.io/");
-        const recipient = item.recipientEmail ?? profile.email;
-        const result = await ctx.executePrivileged(privileged.sendSmtpMail, { ...smtp, to: recipient, subject: item.subjectSnapshot, html });
-        if (result.ok) {
-          const stamp = now();
-          await db.update(s.candidateEmails).set({ status: "sent", attemptedAt: stamp, sentAt: stamp, failureReason: null }).where(eq(s.candidateEmails.id, item.id));
-          await recordMailAttempt(ctx, { kind: "candidate_delivery", recipient, subject: item.subjectSnapshot, status: "sent", relatedId: profile.id, usedPort: result.usedPort, messageId: result.messageId });
-          sent += 1;
-        } else {
-          const reason = result.error ?? "SMTP delivery failed.";
-          await db.update(s.candidateEmails).set({ status: "failed", attemptedAt: now(), failureReason: reason }).where(eq(s.candidateEmails.id, item.id));
-          await recordMailAttempt(ctx, { kind: "candidate_delivery", recipient, subject: item.subjectSnapshot, status: "failed", relatedId: profile.id, failureReason: reason, usedPort: result.usedPort });
-          await addAudit(ctx, "Candidate email delivery failed", "email_delivery", `Queue ${item.id}, port ${result.usedPort}: ${reason}`);
-          failed += 1;
-        }
-      }
-      for (const item of raterQueue) {
-        const rater = raterMap.get(item.raterId);
-        if (!rater) continue;
-        const html = item.htmlSnapshot.replaceAll("{{unsubscribe_url}}", unsubscribe);
-        const result = await ctx.executePrivileged(privileged.sendSmtpMail, { ...smtp, to: rater.email, subject: item.subjectSnapshot, html });
-        if (result.ok) {
-          const stamp = now();
-          await db.update(s.raterEmails).set({ status: "sent", attemptedAt: stamp, sentAt: stamp, failureReason: null }).where(eq(s.raterEmails.id, item.id));
-          if (item.sequenceNumber !== 999) await db.update(s.raters).set(item.sequenceNumber === 0 ? { inviteSentAt: stamp, nextReminderAt: addMs(stamp, (rater.reminderDays ?? 7) * 86400000) } : { lastRemindedAt: stamp, reminderCount: item.sequenceNumber, nextReminderAt: addMs(stamp, (rater.reminderDays ?? 7) * 86400000) }).where(eq(s.raters.id, rater.id));
-          await recordMailAttempt(ctx, { kind: "rater_delivery", recipient: rater.email, subject: item.subjectSnapshot, status: "sent", relatedId: item.profileId, usedPort: result.usedPort, messageId: result.messageId });
-          sent += 1;
-        } else {
-          const reason = result.error ?? "SMTP delivery failed.";
-          await db.update(s.raterEmails).set({ status: "failed", attemptedAt: now(), failureReason: reason }).where(eq(s.raterEmails.id, item.id));
-          await recordMailAttempt(ctx, { kind: "rater_delivery", recipient: rater.email, subject: item.subjectSnapshot, status: "failed", relatedId: item.profileId, failureReason: reason, usedPort: result.usedPort });
-          await addAudit(ctx, "Rater email delivery failed", "email_delivery", `Queue ${item.id}, port ${result.usedPort}: ${reason}`);
-          failed += 1;
-        }
-      }
-      await reconcileRaterEmails(ctx);
-    }
+    const db = ctx.db<typeof s>();const { sent, failed } = await processEmailQueue(ctx);
     const candidateRows = await db.select({ status: s.candidateEmails.status, count: sql<number>`count(*)` }).from(s.candidateEmails).groupBy(s.candidateEmails.status);const raterRows=await db.select({status:s.raterEmails.status,count:sql<number>`count(*)`}).from(s.raterEmails).groupBy(s.raterEmails.status);
     const counts=new Map<string,number>();for(const row of [...candidateRows,...raterRows])counts.set(row.status,(counts.get(row.status)??0)+Number(row.count));
     ctx.invalidateQueries();
@@ -1486,10 +1499,10 @@ export const Actions = {
   retryEmailDelivery: defineAction({request:z.object({callerProfileId:z.number().int(),queue:z.enum(["candidate","rater"]),id:z.number().int()}),response:okResponse,async handler(ctx,a){if(!(await requireAdmin(ctx,a.callerProfileId)))return adminUnauthorized;const db=ctx.db<typeof s>();if(a.queue==="candidate")await db.update(s.candidateEmails).set({status:"queued",failureReason:null}).where(and(eq(s.candidateEmails.id,a.id),eq(s.candidateEmails.status,"failed")));else await db.update(s.raterEmails).set({status:"queued",failureReason:null}).where(and(eq(s.raterEmails.id,a.id),eq(s.raterEmails.status,"failed")));ctx.invalidateQueries();return{ok:true,message:"Email returned to the delivery queue."};}}),
   saveUpgradeSchedule: defineAction({request:z.object({callerProfileId:z.number().int(),delays:z.tuple([z.number().int().min(1).max(365),z.number().int().min(1).max(365),z.number().int().min(1).max(365),z.number().int().min(1).max(365),z.number().int().min(1).max(365),z.number().int().min(1).max(365)])}),response:okResponse,async handler(ctx,a){if(!(await requireAdmin(ctx,a.callerProfileId)))return adminUnauthorized;const db=ctx.db<typeof s>();const stamp=now();for(let index=0;index<a.delays.length;index+=1){const days=a.delays[index];if(days===undefined)continue;await db.insert(s.settings).values({key:upgradeSettingKey(index+1),value:String(days),updatedAt:stamp}).onConflictDoUpdate({target:s.settings.key,set:{value:String(days),updatedAt:stamp}});}await reconcileCandidateEmails(ctx);await addAudit(ctx,"Updated snapshot upgrade schedule","setting",a.delays.map((days,index)=>`Email ${index+1}: ${days} day${days===1?"":"s"} after ${index===0?"completion":"previous email"}`).join(" · "));ctx.invalidateQueries();return{ok:true,message:"Snapshot upgrade email timing saved. Pending messages have been rescheduled."};}}),
   generateHistoricalReportPdf: defineAction({
-    request:z.object({profileId:z.number().int(),historyId:z.number().int()}),
+    request:z.object({profileId:z.number().int(),historyId:z.number().int(),reportType:z.enum(["self","360"]).optional()}),
     response:z.object({ok:z.boolean(),message:z.string(),filename:z.string().optional(),pdfBase64:z.string().optional()}),
     privileged:[privileged.renderReportPdf],
-    async handler(ctx,a){const db=ctx.db<typeof s>();const [profiles,history,categories,capabilities,questionRows,comments]=await Promise.all([db.select().from(s.profiles).where(eq(s.profiles.id,a.profileId)).limit(1),db.select().from(s.assessmentHistory).where(and(eq(s.assessmentHistory.id,a.historyId),eq(s.assessmentHistory.profileId,a.profileId))).limit(1),db.select().from(s.categories).where(eq(s.categories.active,true)).orderBy(asc(s.categories.id)),db.select().from(s.capabilities).where(eq(s.capabilities.active,true)).orderBy(asc(s.capabilities.id)),db.select({capabilityId:s.questions.capabilityId,categoryId:s.questions.categoryId}).from(s.questions).orderBy(asc(s.questions.id)),db.select().from(s.reportComments)]);const profile=profiles[0],entry=history[0];if(!profile||!entry)return{ok:false,message:"That assessment history entry is unavailable."};let report:any;try{report=JSON.parse(entry.reportJson)}catch{return{ok:false,message:"That archived report could not be read."}}const categoryByCapability=new Map<number,number>();for(const row of questionRows)if(!categoryByCapability.has(row.capabilityId))categoryByCapability.set(row.capabilityId,row.categoryId);const variant=entry.mode==="snapshot"?"Snapshot":entry.mode==="360"?"360_Assessment":"Detailed";const rendered=await ctx.executePrivileged(privileged.renderReportPdf,{templateInput:{candidateName:`${profile.firstName} ${profile.lastName}`.trim(),reportDate:new Intl.DateTimeFormat("en-US",{month:"long",day:"2-digit",year:"numeric",timeZone:"America/Toronto"}).format(entry.completedAt),detailed:entry.mode!=="snapshot",teaser:false,comparisonSource:entry.mode==="360"?"raters":"professional",report,categories,capabilities:capabilities.map(capability=>({...capability,categoryId:categoryByCapability.get(capability.id)??null})),comments}});const safeName=`${profile.firstName}_${profile.lastName}`.replace(/[^A-Za-z0-9_-]+/g,"_");return{ok:true,message:"Archived report ready.",filename:`${safeName}_OrgInsights_${variant}_Attempt_${entry.attemptGroup}.pdf`,pdfBase64:rendered.pdfBase64};}
+    async handler(ctx,a){const db=ctx.db<typeof s>();const [profiles,history,categories,capabilities,questionRows,comments]=await Promise.all([db.select().from(s.profiles).where(eq(s.profiles.id,a.profileId)).limit(1),db.select().from(s.assessmentHistory).where(and(eq(s.assessmentHistory.id,a.historyId),eq(s.assessmentHistory.profileId,a.profileId))).limit(1),db.select().from(s.categories).where(eq(s.categories.active,true)).orderBy(asc(s.categories.id)),db.select().from(s.capabilities).where(eq(s.capabilities.active,true)).orderBy(asc(s.capabilities.id)),db.select({capabilityId:s.questions.capabilityId,categoryId:s.questions.categoryId}).from(s.questions).orderBy(asc(s.questions.id)),db.select().from(s.reportComments)]);const profile=profiles[0],entry=history[0];if(!profile||!entry)return{ok:false,message:"That assessment history entry is unavailable."};let report:any;try{report=JSON.parse(entry.reportJson)}catch{return{ok:false,message:"That archived report could not be read."}}const categoryByCapability=new Map<number,number>();for(const row of questionRows)if(!categoryByCapability.has(row.capabilityId))categoryByCapability.set(row.capabilityId,row.categoryId);const requestedType=a.reportType??(entry.mode==="360"?"360":"self");const is360Report=requestedType==="360";const variant=entry.mode==="snapshot"?"Snapshot":is360Report?"360_Assessment":"Detailed";const rendered=await ctx.executePrivileged(privileged.renderReportPdf,{templateInput:{candidateName:`${profile.firstName} ${profile.lastName}`.trim(),reportDate:new Intl.DateTimeFormat("en-US",{month:"long",day:"2-digit",year:"numeric",timeZone:"America/Toronto"}).format(entry.completedAt),detailed:entry.mode!=="snapshot",teaser:false,comparisonSource:is360Report?"raters":"professional",report,categories,capabilities:capabilities.map(capability=>({...capability,categoryId:categoryByCapability.get(capability.id)??null})),comments}});const safeName=`${profile.firstName}_${profile.lastName}`.replace(/[^A-Za-z0-9_-]+/g,"_");return{ok:true,message:"Archived report ready.",filename:`${safeName}_OrgInsights_${variant}_Attempt_${entry.attemptGroup}.pdf`,pdfBase64:rendered.pdfBase64};}
   }),
   saveCoachingSession: defineAction({request:z.object({profileId:z.number().int(),sessionDate:z.string().regex(/^\d{4}-\d{2}-\d{2}$/)}),response:okResponse,async handler(ctx,a){const db=ctx.db<typeof s>();const rows=await db.select().from(s.profiles).where(eq(s.profiles.id,a.profileId)).limit(1);const profile=rows[0];if(!profile||profile.plan!=="coaching")return{ok:false,message:"Coaching access is required."};const today=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Toronto",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());if(a.sessionDate<today)return{ok:false,message:"Choose today or a future session date."};if(profile.coachingSessionDate&&profile.coachingSessionDate>=today)return{ok:false,message:`Your session on ${profile.coachingSessionDate} must pass before another can be booked.`};await db.update(s.profiles).set({coachingSessionDate:a.sessionDate,coachingBookedAt:now()}).where(eq(s.profiles.id,a.profileId));await addAudit(ctx,"Confirmed coaching session","profile",`Profile ${a.profileId} · ${a.sessionDate}`);ctx.invalidateQueries();return{ok:true,message:"Your coaching session date is saved."};}}),
   createQuestion: defineAction({request:z.object({callerProfileId:z.number().int(),prompt:z.string().min(1),instruction:z.string(),track:z.string().min(1),categoryId:z.number().int(),capabilityId:z.number().int(),status:z.enum(["live","draft"]),imageBase64:z.string().optional(),imageMime:z.enum(["image/png","image/jpeg","image/webp"]).optional()}),response:okResponse,async handler(ctx,a){if(!(await requireAdmin(ctx,a.callerProfileId)))return adminUnauthorized;const db=ctx.db<typeof s>();const maxRows=await db.select({value:sql<number>`coalesce(max(${s.questions.id}),0)`}).from(s.questions);const id=Number(maxRows[0]?.value??0)+1;let imageBlobKey:string|null=null;if(a.imageBase64&&a.imageMime){imageBlobKey=`question-images/${id}-${crypto.randomUUID()}`;const raw=a.imageBase64.includes(",")?a.imageBase64.split(",").at(-1)??"":a.imageBase64;const bytes=Uint8Array.from(atob(raw),char=>char.charCodeAt(0));await ctx.blobs.put(imageBlobKey,bytes,{contentType:a.imageMime});}await db.insert(s.questions).values({id,prompt:a.prompt,instruction:a.instruction,questionTypeId:1,categoryId:a.categoryId,capabilityId:a.capabilityId,track:a.track,showType:imageBlobKey?"image":"text",imageBlobKey,active:true,status:a.status});await db.insert(s.responseOptions).values([0,1,2,3,4,5].map((score,index)=>({id:id*10+index,questionId:id,label:String(score),score})));await addAudit(ctx,"Created question","question",`#${id}`);ctx.invalidateQueries();return{ok:true,message:"Question created."};}}),
