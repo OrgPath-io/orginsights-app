@@ -1449,7 +1449,7 @@ export const Actions = {
         return { ok: activated.ok, direct: activated.ok, selectedTier: pricing.selectedTier, restarted: activated.restarted, message: activated.message };
       }
       const settings = await db.select().from(s.settings).where(eq(s.settings.key, "rater_base_url")).limit(1);
-      const baseUrl = settings[0]?.value?.trim() || "https://app.orginsights.io/";
+      const baseUrl = appBaseUrl(settings[0]?.value);
       const url = new URL(baseUrl);
       url.searchParams.set("checkout", "success");
       url.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
