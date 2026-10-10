@@ -25,6 +25,32 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
 
+// Stripe webhook endpoint (needs raw body for signature verification)
+// Must be registered BEFORE the JSON body parser
+app.post("/api/stripe-webhook", express.raw({ type: "application/json" }), async (req, res) => {
+  const signature = req.headers["stripe-signature"];
+  if (typeof signature !== "string" || !signature) {
+    res.status(400).json({ ok: false, message: "Missing Stripe signature." });
+    return;
+  }
+  const payload = (req.body as Buffer).toString("utf8");
+  try {
+    const action = (Actions as Record<string, unknown>)["handleStripeWebhook"];
+    if (!isAction(action)) {
+      res.status(500).json({ ok: false, message: "Webhook handler not found." });
+      return;
+    }
+    const parsedArgs = action.request.parse({ payload, signature });
+    const ctx = createCtx(undefined, () => {}, () => {});
+    const result = await action.handler(ctx, parsedArgs);
+    const parsedResult = action.response.parse(result);
+    res.json(parsedResult);
+  } catch (error) {
+    console.error("Stripe webhook failed:", error);
+    res.status(500).json({ ok: false, message: error instanceof Error ? error.message : "Webhook failed." });
+  }
+});
+
 // JSON body parsing (actions can include base64 images, allow large payloads)
 app.use(express.json({ limit: "25mb" }));
 

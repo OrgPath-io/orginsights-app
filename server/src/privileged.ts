@@ -3,6 +3,7 @@ import { readFile, rm } from "node:fs/promises";
 import { spawn, type ChildProcess } from "node:child_process";
 import { definePrivilegedContracts, definePrivilegedHandlers, z } from "@hatch/space-sdk";
 import nodemailer from "nodemailer";
+import Stripe from "stripe";
 import { renderOriginalReportHtml, type TemplateInput } from "./report-template";
 
 export const privileged = definePrivilegedContracts({
@@ -23,6 +24,38 @@ export const privileged = definePrivilegedContracts({
   sendSmtpMail: {
     request: z.object({ host: z.string().min(1), user: z.string().min(1), password: z.string().min(1), port: z.number().int().min(1).max(65535), fromEmail: z.string().email(), fromName: z.string().min(1), to: z.string().email(), subject: z.string().min(1), html: z.string().min(1) }),
     response: z.object({ ok: z.boolean(), usedPort: z.number().int(), messageId: z.string().optional(), error: z.string().optional() }),
+    timeoutMs: 30000,
+  },
+  createStripeCheckoutSession: {
+    request: z.object({
+      amountCents: z.number().int().positive(),
+      productName: z.string().min(1),
+      profileId: z.number().int().positive(),
+      item: z.enum(["full", "360", "coaching", "additional_coaching"]),
+      discountCode: z.string().nullable(),
+      customerEmail: z.string().email(),
+      successUrl: z.string().url(),
+      cancelUrl: z.string().url(),
+    }),
+    response: z.object({ id: z.string().min(1), url: z.string().url() }),
+    timeoutMs: 30000,
+  },
+  verifyStripeCheckoutWebhook: {
+    request: z.object({ payload: z.string().min(1), signature: z.string().min(1) }),
+    response: z.object({
+      handled: z.boolean(),
+      sessionId: z.string().nullable(),
+      paymentStatus: z.string().nullable(),
+      profileId: z.number().int().positive().nullable(),
+      item: z.enum(["full", "360", "coaching", "additional_coaching"]).nullable(),
+      discountCode: z.string().nullable(),
+      subtotalCents: z.number().int().nonnegative(),
+      taxCents: z.number().int().nonnegative(),
+      totalCents: z.number().int().nonnegative(),
+      customerCountry: z.string().nullable(),
+      taxRate: z.number().nonnegative().nullable(),
+      taxLabel: z.string().nullable(),
+    }),
     timeoutMs: 30000,
   },
 });
@@ -101,6 +134,12 @@ async function renderWithChromium(html: string): Promise<string> {
   }
 }
 
+function stripeClient() {
+  const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
+  if (!secretKey) throw new Error("Stripe is not configured. Add STRIPE_SECRET_KEY to the server environment.");
+  return new Stripe(secretKey);
+}
+
 export const privilegedHandlers = definePrivilegedHandlers(privileged, {
   async renderReportPdf(args) {
     const html = renderOriginalReportHtml(args.templateInput as TemplateInput);
@@ -141,5 +180,82 @@ export const privilegedHandlers = definePrivilegedHandlers(privileged, {
       const redacted = [args.password, args.user].filter(Boolean).reduce((value, secret) => value.split(secret).join("[redacted]"), raw);
       return { ok: false, usedPort: port, error: redacted.slice(0, 480) };
     }
+  },
+  async createStripeCheckoutSession(args) {
+    const stripe = stripeClient();
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      billing_address_collection: "required",
+      automatic_tax: { enabled: true },
+      customer_email: args.customerEmail,
+      customer_creation: "always",
+      line_items: [{
+        quantity: 1,
+        price_data: {
+          currency: "usd",
+          unit_amount: args.amountCents,
+          product_data: { name: args.productName },
+        },
+      }],
+      metadata: {
+        profileId: String(args.profileId),
+        item: args.item,
+        discountCode: args.discountCode ?? "",
+      },
+      payment_intent_data: {
+        receipt_email: args.customerEmail,
+        metadata: {
+          profileId: String(args.profileId),
+          item: args.item,
+          discountCode: args.discountCode ?? "",
+        },
+      },
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `${args.productName} from Orgpath Inc.`,
+          custom_fields: [
+            { name: "Business", value: "Orgpath Inc." },
+            { name: "HST #", value: "721336477RT0001" },
+          ],
+          footer: "Canadian GST/HST is charged on top according to the billing province. No tax is added outside Canada.",
+        },
+      },
+      success_url: args.successUrl,
+      cancel_url: args.cancelUrl,
+    });
+    if (!session.url) throw new Error("Stripe created the Checkout Session without a redirect URL.");
+    return { id: session.id, url: session.url };
+  },
+  async verifyStripeCheckoutWebhook(args) {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+    if (!webhookSecret) throw new Error("Stripe webhooks are not configured. Add STRIPE_WEBHOOK_SECRET to the server environment.");
+    const stripe = stripeClient();
+    const event = stripe.webhooks.constructEvent(args.payload, args.signature, webhookSecret);
+    if (event.type !== "checkout.session.completed") {
+      return { handled: false, sessionId: null, paymentStatus: null, profileId: null, item: null, discountCode: null, subtotalCents: 0, taxCents: 0, totalCents: 0, customerCountry: null, taxRate: null, taxLabel: null };
+    }
+    const session = event.data.object;
+    const metadata = session.metadata ?? {};
+    const profileId = Number(metadata.profileId);
+    const item = metadata.item;
+    if (!Number.isInteger(profileId) || profileId <= 0 || !["full", "360", "coaching", "additional_coaching"].includes(item ?? "")) {
+      throw new Error("The completed Stripe session is missing valid purchase metadata.");
+    }
+    const tax = session.total_details?.breakdown?.taxes?.[0];
+    return {
+      handled: true,
+      sessionId: session.id,
+      paymentStatus: session.payment_status,
+      profileId,
+      item: item as "full" | "360" | "coaching" | "additional_coaching",
+      discountCode: metadata.discountCode || null,
+      subtotalCents: session.amount_subtotal ?? 0,
+      taxCents: session.total_details?.amount_tax ?? 0,
+      totalCents: session.amount_total ?? 0,
+      customerCountry: session.customer_details?.address?.country ?? null,
+      taxRate: tax?.rate?.percentage ?? null,
+      taxLabel: tax?.rate?.display_name ?? null,
+    };
   },
 });

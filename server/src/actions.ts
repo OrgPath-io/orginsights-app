@@ -6,6 +6,8 @@ import { privilegedContracts as privileged } from "../runtime/privileged-impl";
 const anyResponse = z.object({ data: z.any() });
 const okResponse = z.object({ ok: z.boolean(), message: z.string() });
 const adminPasswordResponse = z.object({ ok: z.boolean(), message: z.string(), resetUrl: z.string().optional() });
+const checkoutItemSchema = z.enum(["full", "360", "coaching", "additional_coaching"]);
+const stripeCheckoutResponse = z.object({ ok: z.boolean(), message: z.string(), url: z.string().url().optional(), sessionId: z.string().optional(), direct: z.boolean().optional(), selectedTier: checkoutItemSchema.optional(), restarted: z.boolean().optional() });
 const now = () => new Date();
 const ACCESS_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 type PaidTier = "full" | "360" | "coaching";
@@ -844,6 +846,111 @@ async function archiveCompletedAttempt(ctx: Ctx, profileId: number, attemptGroup
   await db.insert(s.assessmentHistory).values({ profileId, attemptGroup, mode: profile.assessmentMode, selfAssessmentId: self.id, professionalAssessmentId: professional.id, reportJson: JSON.stringify(report), completedAt: professional.completedAt ?? now() }).onConflictDoUpdate({ target: [s.assessmentHistory.profileId, s.assessmentHistory.attemptGroup], set: { reportJson: JSON.stringify(report), completedAt: professional.completedAt ?? now(), mode: profile.assessmentMode } });
 }
 
+type CheckoutItem = z.infer<typeof checkoutItemSchema>;
+type CheckoutPricing = {
+  profile: typeof s.profiles.$inferSelect;
+  selectedTier: CheckoutItem;
+  amount: number;
+  discount: number;
+  code: string | null;
+  coachReferral: typeof s.referralCodes.$inferSelect | null;
+  alreadyOwned: boolean;
+  error: string | null;
+};
+
+const checkoutProductName = (item: CheckoutItem) => item === "full" ? "Full OrgInsights Assessment" : item === "360" ? "OrgInsights & 360 Assessment" : item === "coaching" ? "Assessment & Coaching" : "Additional Coaching Session";
+const money = (value: number) => value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+function receiptAmountBreakdown(amount: number, taxAmount: number, taxRate: number | null, taxLabel: string | null) {
+  const taxName = taxLabel ? `${taxLabel}${taxRate !== null ? ` ${taxRate}%` : ""}` : "Tax";
+  return `<span style="display:inline-grid;gap:3px"><span>Subtotal: ${money(amount)}</span><span>${taxName}: ${money(taxAmount)}</span><strong>Total: ${money(amount + taxAmount)}</strong></span>`;
+}
+
+async function resolveCheckoutPricing(ctx: Ctx, profileId: number, item: CheckoutItem, enteredCode?: string): Promise<CheckoutPricing | null> {
+  const db = ctx.db<typeof s>();
+  const profileRows = await db.select().from(s.profiles).where(eq(s.profiles.id, profileId)).limit(1);
+  const profile = profileRows[0];
+  if (!profile) return null;
+  if (item === "additional_coaching") {
+    return { profile, selectedTier: item, amount: 149, discount: 0, code: null, coachReferral: null, alreadyOwned: false, error: profile.plan !== "coaching" || !profile.coachingSessionDate ? "Book your included coaching session before purchasing an additional session." : null };
+  }
+  const normalizedCode = enteredCode?.trim().toUpperCase() || null;
+  const enteredRows = normalizedCode ? await db.select().from(s.referralCodes).where(and(eq(s.referralCodes.code, normalizedCode), eq(s.referralCodes.active, true))).limit(1) : [];
+  const enteredReferral = enteredRows[0] ?? null;
+  const assignedRows = profile.referralCode ? await db.select().from(s.referralCodes).where(and(eq(s.referralCodes.code, profile.referralCode), eq(s.referralCodes.active, true))).limit(1) : [];
+  const assignedReferral = assignedRows[0] ?? null;
+  const coachReferral = enteredReferral?.isCoachCode ? enteredReferral : profile.coachDisclosure && assignedReferral?.isCoachCode ? assignedReferral : null;
+  const selectedTier: PaidTier = coachReferral?.unlockTier ?? item;
+  const alreadyOwned = profile.plan === "coaching" || profile.plan === selectedTier || (profile.plan === "360" && selectedTier === "full");
+  const settingsRows = await db.select().from(s.settings);
+  const settingMap = Object.fromEntries(settingsRows.map((row) => [row.key, row.value]));
+  const listedBase = Number(settingMap[tierSettingKey(selectedTier)] ?? tierDefaultPrice(selectedTier));
+  const base = profile.plan === "full" && selectedTier === "360" ? 49 : listedBase;
+  let discount = 0;
+  let code: string | null = null;
+  let amount = base;
+  if (selectedTier !== "coaching" && coachReferral) {
+    code = coachReferral.code;
+    if (coachReferral.pricingMode === "free") { discount = 100; amount = 0; }
+    else if (coachReferral.pricingMode === "fixed") amount = Math.max(0, Number(coachReferral.fixedPrice ?? 0));
+    else { discount = coachReferral.discountPercent; amount = Math.round(base * (100 - discount)) / 100; }
+  } else if (selectedTier !== "coaching" && enteredReferral && !enteredReferral.isCoachCode) {
+    discount = enteredReferral.discountPercent;
+    code = enteredReferral.code;
+    amount = Math.round(base * (100 - discount)) / 100;
+  }
+  return { profile, selectedTier, amount, discount, code, coachReferral, alreadyOwned, error: null };
+}
+
+async function activatePaidCheckout(ctx: Ctx, purchase: { profileId: number; item: CheckoutItem; amount: number; taxAmount: number; taxRate: number | null; taxLabel: string | null; discountCode: string | null; stripeSessionId: string | null }) {
+  const db = ctx.db<typeof s>();
+  if (purchase.stripeSessionId) {
+    const existing = await db.select({ id: s.orders.id }).from(s.orders).where(eq(s.orders.stripeSessionId, purchase.stripeSessionId)).limit(1);
+    if (existing[0]) return { ok: true, message: "This Stripe payment was already applied.", restarted: false, duplicate: true };
+  }
+  const profileRows = await db.select().from(s.profiles).where(eq(s.profiles.id, purchase.profileId)).limit(1);
+  const profile = profileRows[0];
+  if (!profile) return { ok: false, message: "Profile not found.", restarted: false, duplicate: false };
+  if (purchase.item === "additional_coaching" && (profile.plan !== "coaching" || !profile.coachingSessionDate)) return { ok: false, message: "The included coaching session must be booked before an additional session can be added.", restarted: false, duplicate: false };
+  const restarting = purchase.item !== "additional_coaching" && profile.assessmentMode === "snapshot";
+  let accessExpiresAt = profile.accessExpiresAt;
+  if (purchase.item !== "additional_coaching") {
+    const selectedTier = purchase.item as PaidTier;
+    if (restarting) await resetAssessmentsForPaidPath(ctx, profile.id, tierMode(selectedTier));
+    else await db.update(s.profiles).set({ assessmentMode: tierMode(selectedTier) }).where(eq(s.profiles.id, profile.id));
+    if (tierMode(selectedTier) === "360") await db.insert(s.raterCampaigns).values({ profileId: profile.id, status: "draft", reminderDays: 7, createdAt: now() }).onConflictDoNothing();
+    accessExpiresAt = new Date(Date.now() + ONE_YEAR_MS);
+    await db.update(s.profiles).set({ plan: selectedTier, accessExpiresAt }).where(eq(s.profiles.id, profile.id));
+    await cancelUpgradeEmails(ctx, profile.id);
+  }
+  const orderRows = await db.insert(s.orders).values({
+    profileId: profile.id,
+    item: purchase.item,
+    amount: purchase.amount,
+    taxAmount: purchase.taxAmount,
+    taxRate: purchase.taxRate,
+    taxLabel: purchase.taxLabel,
+    stripeSessionId: purchase.stripeSessionId,
+    discountCode: purchase.discountCode,
+    status: "paid",
+    createdAt: now(),
+  }).returning();
+  const order = orderRows[0];
+  if (order && purchase.amount + purchase.taxAmount > 0) {
+    await ensureEmailTemplates(ctx);
+    const receiptRows = await db.select().from(s.emailTemplates).where(eq(s.emailTemplates.templateKey, "payment_receipt")).limit(1);
+    const receiptTemplate = receiptRows[0];
+    if (receiptTemplate) {
+      const fields = { tier_name: checkoutProductName(purchase.item), amount_paid: receiptAmountBreakdown(purchase.amount, purchase.taxAmount, purchase.taxRate, purchase.taxLabel), order_date: new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "long", day: "numeric", timeZone: "America/Toronto" }).format(order.createdAt) };
+      const receiptProfile = purchase.item === "additional_coaching" ? profile : { ...profile, plan: purchase.item as PaidTier, accessExpiresAt };
+      await scheduleCandidateEmail(ctx, receiptProfile, receiptTemplate, now(), null, false, fields, null, `order-${order.id}`);
+    }
+  }
+  const taxDetail = purchase.taxAmount > 0 ? ` · ${purchase.taxLabel ?? "tax"} ${money(purchase.taxAmount)}` : " · no tax";
+  await addAudit(ctx, "Recorded Stripe payment", "order", `${purchase.item} one-time tier · subtotal ${money(purchase.amount)}${taxDetail}${restarting ? " · snapshot answers cleared" : ""}`);
+  ctx.invalidateQueries();
+  return { ok: true, message: purchase.item === "additional_coaching" ? "Additional coaching session purchased. You can book it after your current session has taken place." : `${checkoutProductName(purchase.item)} unlocked.`, restarted: restarting, duplicate: false };
+}
+
 export const Actions = {
   getWorkspace: defineAction({ request: z.object({}), response: anyResponse, privileged: [privileged.loadLegacySmtpConfiguration], async handler(ctx) {
     const db = ctx.db<typeof s>();
@@ -1315,6 +1422,76 @@ export const Actions = {
     const label=selectedTier==="full"?"Full OrgInsights Assessment":selectedTier==="360"?"OrgInsights & 360 Assessment":"Assessment & Coaching";
     return{data:{amount,discount,restarted:restartingFromSnapshot,coachAccessActivated:Boolean(coachReferral),selectedTier,message:coachReferral?`Coach-code checkout recorded. Your ${label} tier is unlocked.`:restartingFromSnapshot?`${label} unlocked. Snapshot answers were cleared so you can begin the complete assessment from the start.`:`Purchase complete. Your ${label} tier is unlocked.`}};
   }}),
+  createStripeCheckoutSession: defineAction({
+    request: z.object({ profileId: z.number().int(), item: checkoutItemSchema, code: z.string().optional() }),
+    response: stripeCheckoutResponse,
+    privileged: [privileged.createStripeCheckoutSession],
+    async handler(ctx, args): Promise<z.infer<typeof stripeCheckoutResponse>> {
+      const db = ctx.db<typeof s>();
+      const pricing = await resolveCheckoutPricing(ctx, args.profileId, args.item, args.code);
+      if (!pricing) return { ok: false, message: "Profile not found." };
+      if (pricing.error) return { ok: false, message: pricing.error };
+      if (pricing.coachReferral && args.item !== "additional_coaching") {
+        await db.update(s.profiles).set({ referralCode: pricing.coachReferral.code, coachDisclosure: true, coachResultToken: pricing.profile.coachResultToken ?? makeRaterToken() }).where(eq(s.profiles.id, args.profileId));
+      }
+      if (pricing.alreadyOwned) {
+        const restarted = pricing.profile.assessmentMode === "snapshot";
+        if (restarted && pricing.selectedTier !== "additional_coaching") {
+          await resetAssessmentsForPaidPath(ctx, args.profileId, tierMode(pricing.selectedTier as PaidTier));
+          await addAudit(ctx, "Started included paid assessment", "profile", `Profile ${args.profileId} · ${pricing.selectedTier} tier · checkout bypassed · snapshot answers cleared`);
+        }
+        await cancelUpgradeEmails(ctx, args.profileId);
+        ctx.invalidateQueries();
+        return { ok: true, direct: true, selectedTier: pricing.selectedTier, restarted, message: restarted ? "Your paid tier is already included. Snapshot answers were cleared so you can begin the complete question set." : "This one-time tier is already active. No checkout is needed." };
+      }
+      if (pricing.amount === 0) {
+        const activated = await activatePaidCheckout(ctx, { profileId: args.profileId, item: pricing.selectedTier, amount: 0, taxAmount: 0, taxRate: null, taxLabel: null, discountCode: pricing.code, stripeSessionId: null });
+        return { ok: activated.ok, direct: activated.ok, selectedTier: pricing.selectedTier, restarted: activated.restarted, message: activated.message };
+      }
+      const settings = await db.select().from(s.settings).where(eq(s.settings.key, "rater_base_url")).limit(1);
+      const baseUrl = settings[0]?.value?.trim() || "https://app.orginsights.io/";
+      const url = new URL(baseUrl);
+      url.searchParams.set("checkout", "success");
+      url.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
+      const successUrl = url.toString().replace("%7BCHECKOUT_SESSION_ID%7D", "{CHECKOUT_SESSION_ID}");
+      const cancel = new URL(baseUrl);
+      cancel.searchParams.set("checkout", "cancelled");
+      cancel.searchParams.set("view", "pricing");
+      const stripeSession = await ctx.executePrivileged(privileged.createStripeCheckoutSession, {
+        amountCents: Math.round(pricing.amount * 100),
+        productName: checkoutProductName(pricing.selectedTier),
+        profileId: args.profileId,
+        item: pricing.selectedTier,
+        discountCode: pricing.code,
+        customerEmail: pricing.profile.email,
+        successUrl,
+        cancelUrl: cancel.toString(),
+      });
+      return { ok: true, message: "Secure checkout is ready.", url: stripeSession.url, sessionId: stripeSession.id, selectedTier: pricing.selectedTier };
+    },
+  }),
+  handleStripeWebhook: defineAction({
+    request: z.object({ payload: z.string().min(1), signature: z.string().min(1) }),
+    response: okResponse,
+    privileged: [privileged.verifyStripeCheckoutWebhook],
+    async handler(ctx, args) {
+      const event = await ctx.executePrivileged(privileged.verifyStripeCheckoutWebhook, args);
+      if (!event.handled) return { ok: true, message: "Stripe event acknowledged." };
+      if (!event.sessionId || !event.profileId || !event.item) return { ok: false, message: "The Stripe event did not include complete checkout metadata." };
+      if (event.paymentStatus !== "paid" && event.paymentStatus !== "no_payment_required") return { ok: false, message: "The Checkout Session is not paid." };
+      const activated = await activatePaidCheckout(ctx, {
+        profileId: event.profileId,
+        item: event.item,
+        amount: event.subtotalCents / 100,
+        taxAmount: event.taxCents / 100,
+        taxRate: event.taxRate,
+        taxLabel: event.taxLabel,
+        discountCode: event.discountCode,
+        stripeSessionId: event.sessionId,
+      });
+      return { ok: activated.ok, message: activated.message };
+    },
+  }),
   listReputationScans: defineAction({
     request: z.object({ profile_id: z.number().int().positive(), limit: z.number().int().positive().max(30).default(12) }),
     response: z.object({ scans: z.array(reputationScanSummarySchema) }),
