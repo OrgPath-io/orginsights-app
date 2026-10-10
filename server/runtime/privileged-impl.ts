@@ -313,7 +313,6 @@ export async function executePrivileged<C extends PrivilegedContract>(
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
         billing_address_collection: "required",
-        automatic_tax: { enabled: true },
         customer_email: stripeArgs.customerEmail,
         customer_creation: "always",
         line_items: [{
