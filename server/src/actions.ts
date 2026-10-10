@@ -453,7 +453,7 @@ async function reconcileCandidateEmails(ctx: Ctx) {
     } else {
       await db.update(s.candidateEmails).set({ status: "cancelled", cancelledAt: now() }).where(and(eq(s.candidateEmails.profileId, profile.id), eq(s.candidateEmails.status, "scheduled"), inArray(s.candidateEmails.templateKey, ["welcome", "nudge_1", "nudge_2", "nudge_3", "nudge_4", "reminder_1", "reminder_2", "reminder_3", "reminder_4", "reminder_5"])));
       const professionalAssessmentId = professionalCompleted?.id ?? null;
-      const template = templateMap.get("thank_you"); if (template) await scheduleCandidateEmail(ctx, profile, template, now(), professionalAssessmentId);
+      const template = templateMap.get("thank_you"); if (template) await scheduleCandidateEmail(ctx, profile, template, now(), professionalAssessmentId, false, {}, null, `completed-${professionalAssessmentId}`);
       if (eligibleForUpgradeSequence && professionalCompleted?.completedAt) {
         let scheduledAt = professionalCompleted.completedAt;
         for (let index = 0; index < UPGRADE_EMAIL_KEYS.length; index += 1) {
