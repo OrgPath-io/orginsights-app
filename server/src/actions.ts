@@ -67,8 +67,16 @@ async function verifyPassword(password: string, hash: string): Promise<boolean> 
   }
 }
 
+function appBaseUrl(settingValue?: string | null): string {
+  const envBase = (process.env.APP_BASE_URL ?? "").trim();
+  if (envBase) return envBase;
+  const setting = (settingValue ?? "").trim();
+  if (setting) return setting;
+  return "https://app.orginsights.io/";
+}
+
 function resetLink(baseUrl: string, token: string) {
-  const base = baseUrl.trim() || "https://app.orginsights.io/";
+  const base = appBaseUrl(baseUrl);
   const joiner = base.includes("?") ? "&" : "?";
   return `${base}${joiner}resetPassword=${encodeURIComponent(token)}`;
 }
@@ -429,7 +437,7 @@ async function reconcileCandidateEmails(ctx: Ctx) {
   });
   const disabledKeys = templates.filter((template) => !template.enabled).map((template) => template.templateKey);
   if (disabledKeys.length) await db.update(s.candidateEmails).set({ status: "cancelled", cancelledAt: now() }).where(and(inArray(s.candidateEmails.templateKey, disabledKeys), inArray(s.candidateEmails.status, ["scheduled", "queued", "failed"])));
-  const baseUrl = settingMap.get("rater_base_url")?.trim() || "https://app.orginsights.io/";
+  const baseUrl = appBaseUrl(settingMap.get("rater_base_url"));
   const formatDate = (date: Date) => new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "long", day: "numeric", timeZone: "America/Toronto" }).format(date);
   const planLabel = (plan: string) => plan === "full" ? "Full OrgInsights Assessment" : plan === "360" ? "OrgInsights & 360 Assessment" : plan === "coaching" ? "Assessment & Coaching" : "Free Snapshot/Summary";
   for (const profile of profiles) {
