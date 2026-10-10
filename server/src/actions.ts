@@ -363,6 +363,7 @@ async function reconcileRaterEmails(ctx: Ctx) {
     }
   }
   await db.update(s.raterEmails).set({ status: "queued", queuedAt: now() }).where(and(eq(s.raterEmails.status, "scheduled"), sql`${s.raterEmails.scheduledAt} <= ${now()}`));
+  await processEmailQueue(ctx);
 }
 
 function addMs(date: Date, amount: number) { return new Date(date.getTime() + amount); }
