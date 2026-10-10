@@ -321,9 +321,16 @@ export async function executePrivileged<C extends PrivilegedContract>(
           price_data: {
             currency: "usd",
             unit_amount: stripeArgs.amountCents,
-            product_data: { name: stripeArgs.productName },
+            product_data: {
+              name: stripeArgs.productName,
+              tax_code: "txcd_10000000",
+            },
+            tax_behavior: "exclusive",
           },
         }],
+        automatic_tax: {
+          enabled: true,
+        },
         metadata: {
           profileId: String(stripeArgs.profileId),
           item: stripeArgs.item,
