@@ -1309,10 +1309,10 @@ export const Actions = {
     await db.update(s.profiles).set({plan:selectedTier,accessExpiresAt}).where(eq(s.profiles.id,a.profileId));
     await cancelUpgradeEmails(ctx, a.profileId);
     if(amount>0){await ensureEmailTemplates(ctx);const receiptRows=await db.select().from(s.emailTemplates).where(eq(s.emailTemplates.templateKey,"payment_receipt")).limit(1);const receiptTemplate=receiptRows[0],order=orderRows[0];if(receiptTemplate&&order){const label=selectedTier==="full"?"Full OrgInsights Assessment":selectedTier==="360"?"OrgInsights & 360 Assessment":"Assessment & Coaching";const fields={tier_name:label,amount_paid:Number(amount).toLocaleString("en-US",{style:"currency",currency:"USD"}),order_date:new Intl.DateTimeFormat("en-CA",{year:"numeric",month:"long",day:"numeric",timeZone:"America/Toronto"}).format(order.createdAt)};await scheduleCandidateEmail(ctx,{...profile,plan:selectedTier,accessExpiresAt},receiptTemplate,now(),null,false,fields,null,`order-${order.id}`);}}
-    await addAudit(ctx,"Recorded test checkout","order",`${selectedTier} one-time tier · $${amount}${coachReferral?` · coach ${coachReferral.code}`:restartingFromSnapshot?" · snapshot answers cleared":""}`);
+    await addAudit(ctx,"Recorded purchase","order",`${selectedTier} one-time tier · $${amount}${coachReferral?` · coach ${coachReferral.code}`:restartingFromSnapshot?" · snapshot answers cleared":""}`);
     ctx.invalidateQueries();
     const label=selectedTier==="full"?"Full OrgInsights Assessment":selectedTier==="360"?"OrgInsights & 360 Assessment":"Assessment & Coaching";
-    return{data:{amount,discount,restarted:restartingFromSnapshot,coachAccessActivated:Boolean(coachReferral),selectedTier,message:coachReferral?`Coach-code checkout recorded. Your ${label} tier is unlocked.`:restartingFromSnapshot?`${label} unlocked. Snapshot answers were cleared so you can begin the complete assessment from the start.`:`Test checkout recorded. Your ${label} tier is unlocked with a one-time payment.`}};
+    return{data:{amount,discount,restarted:restartingFromSnapshot,coachAccessActivated:Boolean(coachReferral),selectedTier,message:coachReferral?`Coach-code checkout recorded. Your ${label} tier is unlocked.`:restartingFromSnapshot?`${label} unlocked. Snapshot answers were cleared so you can begin the complete assessment from the start.`:`Purchase complete. Your ${label} tier is unlocked.`}};
   }}),
   listReputationScans: defineAction({
     request: z.object({ profile_id: z.number().int().positive(), limit: z.number().int().positive().max(30).default(12) }),
