@@ -290,8 +290,8 @@ function reportCss() {
 .about-page .about-list li{display:grid;grid-template-columns:26px 1fr;align-items:start;margin:0!important;line-height:18px;min-height:42px}
 .about-page .about-list li .icon-wrapper{width:26px}
 .about-page .about-list li .text{padding-left:10px;line-height:18px}
-.about-page .report-summary-wrapper{position:absolute;bottom:0;width:100%}
-.about-page .report-summary{height:420px}
+.about-page .report-summary-wrapper{position:absolute;bottom:260px;width:100%}
+.about-page .report-summary{height:380px}
 .about-page .report-summary ul{display:flex;flex-direction:column;gap:13px}
 .about-page .report-summary li{display:grid;grid-template-columns:30px 1fr;line-height:15px;margin:0!important}
 .about-page .report-summary li .text{padding-left:8px;line-height:15px}
